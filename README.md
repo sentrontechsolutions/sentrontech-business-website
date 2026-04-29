@@ -1,4 +1,4 @@
-# Sentron Tech Solutions Website
+# Sentron Tech Solutions - Business Website
 
 This repository contains the official business website for **Sentron Tech Solutions**, a modern digital solutions company focused on helping businesses build a strong and professional online presence.
 
