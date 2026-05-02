@@ -1,3 +1,15 @@
+// Page loader
+const pageLoader = document.querySelector(".page-loader");
+
+window.addEventListener("load", () => {
+  if (!pageLoader) return;
+
+  window.setTimeout(() => {
+    pageLoader.classList.add("loaded");
+    pageLoader.addEventListener("transitionend", () => pageLoader.remove(), { once: true });
+  }, 350);
+});
+
 // Navbar shadow on scroll
 const navbar = document.querySelector(".navbar");
 
