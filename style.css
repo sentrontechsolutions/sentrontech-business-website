@@ -6,6 +6,8 @@
   --secondary: #7b61ff;
   --text-main: #f4f8ff;
   --text-soft: #9fb3c8;
+  --card-border: rgba(255, 255, 255, 0.22);
+  --card-border-strong: rgba(255, 255, 255, 0.34);
   --shadow-glow: 0 0 20px rgba(0, 229, 255, 0.18);
   --shadow-purple: 0 0 30px rgba(123, 97, 255, 0.18);
 }
@@ -19,6 +21,8 @@ html {
 }
 
 body {
+  position: relative;
+  isolation: isolate;
   margin: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background:
@@ -35,11 +39,47 @@ body::before {
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
+    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(rgba(0, 229, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(123, 97, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px, 40px 40px, 160px 160px, 160px 160px;
+  opacity: 0.72;
   pointer-events: none;
-  z-index: -2;
+  z-index: 0;
+  animation: techTextileDrift 28s linear infinite;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(135deg, transparent 0 42px, rgba(0, 229, 255, 0.026) 42px 43px, transparent 43px 86px),
+    repeating-linear-gradient(45deg, transparent 0 58px, rgba(255, 255, 255, 0.018) 58px 59px, transparent 59px 116px),
+    radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.08), transparent 42%);
+  background-size: 180px 180px, 220px 220px, 100% 100%;
+  opacity: 0.52;
+  pointer-events: none;
+  z-index: 1;
+  animation: techTextileFlow 36s linear infinite;
+}
+
+body > * {
+  position: relative;
+  z-index: 3;
+}
+
+@keyframes techTextileDrift {
+  to {
+    background-position: 0 160px, 0 160px, 0 320px, 0 320px;
+  }
+}
+
+@keyframes techTextileFlow {
+  to {
+    background-position: 0 220px, 0 260px, 0 0;
+  }
 }
 
 /* Page loader */
@@ -128,6 +168,12 @@ body::before {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after,
+  .dev-tool-icon {
+    animation: none;
+  }
+
   .loader-mark::before {
     animation-duration: 2.5s;
   }
@@ -282,6 +328,464 @@ body::before {
   position: relative;
   overflow: hidden;
   padding-top: 100px;
+}
+
+.hero-section > .container {
+  position: relative;
+  z-index: 3;
+}
+
+.dev-tools-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.dev-tool-symbols {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.dev-tool-icon {
+  --tool-color: rgba(0, 229, 255, 0.82);
+  --tool-border: rgba(0, 229, 255, 0.38);
+  --tool-glow: rgba(0, 229, 255, 0.24);
+  --float-x: 18px;
+  --float-y: -28px;
+  --start-rotate: -4deg;
+  --end-rotate: 7deg;
+  position: absolute;
+  width: clamp(38px, 4.2vw, 62px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  color: var(--tool-color);
+  background: rgba(8, 14, 28, 0.58);
+  border: 1px solid var(--tool-border);
+  box-shadow:
+    0 0 26px var(--tool-glow),
+    inset 0 0 18px rgba(255, 255, 255, 0.035);
+  opacity: var(--tool-opacity, 0.64);
+  transform: translate3d(0, 0, 0) scale(1) rotate(var(--start-rotate));
+  transition: opacity 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  animation: devToolPulse var(--float-duration, 12s) ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.dev-tool-svg {
+  width: 58%;
+  height: 58%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.15;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 10px var(--tool-glow));
+}
+
+.tool-code {
+  top: 16vh;
+  left: 7vw;
+  --float-duration: 11s;
+}
+
+.tool-html {
+  top: 72vh;
+  left: 16vw;
+  --tool-color: rgba(255, 124, 82, 0.82);
+  --tool-border: rgba(255, 124, 82, 0.40);
+  --tool-glow: rgba(255, 124, 82, 0.24);
+  --float-x: -14px;
+  --float-y: -34px;
+  --float-duration: 13s;
+  animation-delay: -5s;
+}
+
+.tool-css {
+  top: 29vh;
+  left: 35vw;
+  --tool-color: rgba(76, 169, 255, 0.82);
+  --tool-border: rgba(76, 169, 255, 0.40);
+  --tool-glow: rgba(76, 169, 255, 0.24);
+  --float-x: 22px;
+  --float-y: -20px;
+  --float-duration: 10s;
+  animation-delay: -2s;
+}
+
+.tool-js {
+  right: 9vw;
+  top: 17vh;
+  --tool-color: rgba(255, 219, 89, 0.88);
+  --tool-border: rgba(255, 219, 89, 0.40);
+  --tool-glow: rgba(255, 219, 89, 0.22);
+  --float-x: -18px;
+  --float-duration: 12s;
+  animation-delay: -7s;
+}
+
+.tool-bootstrap {
+  right: 13vw;
+  top: 63vh;
+  --tool-color: rgba(170, 128, 255, 0.84);
+  --tool-border: rgba(170, 128, 255, 0.40);
+  --tool-glow: rgba(170, 128, 255, 0.24);
+  --float-x: 16px;
+  --float-y: -36px;
+  --float-duration: 15s;
+  animation-delay: -3s;
+}
+
+.tool-github {
+  left: 47vw;
+  bottom: 10vh;
+  --tool-color: rgba(230, 235, 244, 0.74);
+  --tool-border: rgba(230, 235, 244, 0.34);
+  --tool-glow: rgba(230, 235, 244, 0.18);
+  --float-x: -12px;
+  --float-duration: 14s;
+  animation-delay: -6s;
+}
+
+.tool-figma {
+  right: 33vw;
+  bottom: 18vh;
+  --tool-color: rgba(255, 111, 142, 0.82);
+  --tool-border: rgba(255, 111, 142, 0.40);
+  --tool-glow: rgba(255, 111, 142, 0.24);
+  --float-x: 20px;
+  --float-y: -24px;
+  --float-duration: 12s;
+  animation-delay: -4s;
+}
+
+.tool-terminal {
+  left: 20vw;
+  top: 49vh;
+  --tool-color: rgba(37, 211, 102, 0.76);
+  --tool-border: rgba(37, 211, 102, 0.38);
+  --tool-glow: rgba(37, 211, 102, 0.22);
+  --float-x: -16px;
+  --float-duration: 16s;
+  animation-delay: -8s;
+}
+
+.tool-photoshop {
+  right: 23vw;
+  top: 41vh;
+  --tool-color: rgba(72, 179, 255, 0.82);
+  --tool-border: rgba(72, 179, 255, 0.38);
+  --tool-glow: rgba(72, 179, 255, 0.22);
+  --float-x: 18px;
+  --float-y: -30px;
+  --float-duration: 13s;
+  animation-delay: -9s;
+}
+
+.tool-illustrator {
+  left: 59vw;
+  top: 11vh;
+  --tool-color: rgba(255, 169, 78, 0.82);
+  --tool-border: rgba(255, 169, 78, 0.40);
+  --tool-glow: rgba(255, 169, 78, 0.22);
+  --float-x: -20px;
+  --float-y: -24px;
+  --float-duration: 14s;
+  animation-delay: -10s;
+}
+
+.tool-premiere {
+  left: 5vw;
+  top: 42vh;
+  --tool-color: rgba(190, 135, 255, 0.84);
+  --tool-border: rgba(190, 135, 255, 0.40);
+  --tool-glow: rgba(190, 135, 255, 0.24);
+  --float-x: 22px;
+  --float-y: -26px;
+  --float-duration: 12s;
+  animation-delay: -11s;
+}
+
+.tool-after-effects {
+  right: 5vw;
+  top: 43vh;
+  --tool-color: rgba(150, 126, 255, 0.84);
+  --tool-border: rgba(150, 126, 255, 0.40);
+  --tool-glow: rgba(150, 126, 255, 0.24);
+  --float-x: -18px;
+  --float-y: -32px;
+  --float-duration: 15s;
+  animation-delay: -12s;
+}
+
+.tool-canva {
+  left: 31vw;
+  bottom: 7vh;
+  --tool-color: rgba(0, 221, 204, 0.82);
+  --tool-border: rgba(0, 221, 204, 0.38);
+  --tool-glow: rgba(0, 221, 204, 0.22);
+  --float-x: 16px;
+  --float-y: -28px;
+  --float-duration: 13s;
+  animation-delay: -13s;
+}
+
+.tool-capcut {
+  right: 7vw;
+  bottom: 19vh;
+  --tool-color: rgba(232, 238, 255, 0.78);
+  --tool-border: rgba(232, 238, 255, 0.34);
+  --tool-glow: rgba(232, 238, 255, 0.18);
+  --float-x: -18px;
+  --float-y: -22px;
+  --float-duration: 16s;
+  animation-delay: -14s;
+}
+
+.tool-image-gen {
+  left: 73vw;
+  bottom: 6vh;
+  --tool-color: rgba(255, 111, 177, 0.82);
+  --tool-border: rgba(255, 111, 177, 0.40);
+  --tool-glow: rgba(255, 111, 177, 0.23);
+  --float-x: 20px;
+  --float-y: -34px;
+  --float-duration: 12s;
+  animation-delay: -15s;
+}
+
+.tool-video {
+  left: 15vw;
+  bottom: 23vh;
+  --tool-color: rgba(255, 214, 104, 0.84);
+  --tool-border: rgba(255, 214, 104, 0.40);
+  --tool-glow: rgba(255, 214, 104, 0.22);
+  --float-x: -16px;
+  --float-y: -30px;
+  --float-duration: 14s;
+  animation-delay: -16s;
+}
+
+.tool-pen {
+  left: 24vw;
+  top: 8vh;
+  --tool-color: rgba(255, 156, 210, 0.8);
+  --tool-border: rgba(255, 156, 210, 0.38);
+  --tool-glow: rgba(255, 156, 210, 0.2);
+  --float-x: 20px;
+  --float-y: -24px;
+  --float-duration: 15s;
+  animation-delay: -17s;
+}
+
+.tool-brush {
+  right: 24vw;
+  bottom: 34vh;
+  --tool-color: rgba(110, 255, 205, 0.78);
+  --tool-border: rgba(110, 255, 205, 0.34);
+  --tool-glow: rgba(110, 255, 205, 0.2);
+  --float-x: -22px;
+  --float-y: -28px;
+  --float-duration: 13s;
+  animation-delay: -18s;
+}
+
+.tool-clone {
+  right: 44vw;
+  top: 78vh;
+  --tool-color: rgba(205, 225, 255, 0.76);
+  --tool-border: rgba(205, 225, 255, 0.32);
+  --tool-glow: rgba(205, 225, 255, 0.18);
+  --float-x: 18px;
+  --float-y: -22px;
+  --float-duration: 16s;
+  animation-delay: -19s;
+}
+
+.tool-pencil {
+  left: 58vw;
+  bottom: 33vh;
+  --tool-color: rgba(255, 235, 145, 0.8);
+  --tool-border: rgba(255, 235, 145, 0.34);
+  --tool-glow: rgba(255, 235, 145, 0.2);
+  --float-x: -18px;
+  --float-y: -28px;
+  --float-duration: 14s;
+  animation-delay: -20s;
+}
+
+.tool-edge-code {
+  left: 2vw;
+  top: 8vh;
+  --float-x: 18px;
+  --float-y: -24px;
+  --float-duration: 15s;
+  animation-delay: -21s;
+}
+
+.tool-edge-html {
+  right: 2vw;
+  top: 6vh;
+  --float-x: -18px;
+  --float-y: -22px;
+  --float-duration: 13s;
+  animation-delay: -22s;
+}
+
+.tool-edge-css {
+  left: 3vw;
+  bottom: 8vh;
+  --float-x: 22px;
+  --float-y: -26px;
+  --float-duration: 16s;
+  animation-delay: -23s;
+}
+
+.tool-edge-js {
+  right: 3vw;
+  bottom: 7vh;
+  --float-x: -20px;
+  --float-y: -24px;
+  --float-duration: 14s;
+  animation-delay: -24s;
+}
+
+.tool-edge-pen {
+  left: 50vw;
+  top: 3vh;
+  --float-x: 18px;
+  --float-y: -20px;
+  --float-duration: 17s;
+  animation-delay: -25s;
+}
+
+.tool-edge-brush {
+  left: 1.5vw;
+  top: 63vh;
+  --float-x: 24px;
+  --float-y: -28px;
+  --float-duration: 13s;
+  animation-delay: -26s;
+}
+
+.tool-edge-clone {
+  right: 1.5vw;
+  top: 75vh;
+  --float-x: -22px;
+  --float-y: -30px;
+  --float-duration: 15s;
+  animation-delay: -27s;
+}
+
+.tool-edge-terminal {
+  right: 48vw;
+  bottom: 2vh;
+  --float-x: -18px;
+  --float-y: -22px;
+  --float-duration: 16s;
+  animation-delay: -28s;
+}
+
+.dev-tool-icon {
+  --tool-color: rgba(255, 255, 255, 0.72);
+  --tool-border: rgba(255, 255, 255, 0.18);
+  --tool-glow: rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 767.98px) {
+  .dev-tool-icon {
+    width: clamp(34px, 10vw, 46px);
+    opacity: 0.5;
+  }
+
+  .tool-css,
+  .tool-github,
+  .tool-figma,
+  .tool-illustrator,
+  .tool-after-effects,
+  .tool-canva,
+  .tool-capcut,
+  .tool-image-gen,
+  .tool-pen,
+  .tool-clone,
+  .tool-pencil,
+  .tool-edge-code,
+  .tool-edge-css,
+  .tool-edge-pen,
+  .tool-edge-brush,
+  .tool-edge-clone,
+  .tool-edge-terminal {
+    display: none;
+  }
+
+  .tool-code {
+    top: 14vh;
+    left: 6vw;
+  }
+
+  .tool-html {
+    top: 73vh;
+    left: 8vw;
+  }
+
+  .tool-js {
+    top: 20vh;
+    right: 7vw;
+  }
+
+  .tool-bootstrap {
+    top: 68vh;
+    right: 8vw;
+  }
+
+  .tool-terminal {
+    top: 49vh;
+    left: 42vw;
+  }
+
+  .tool-photoshop {
+    top: 38vh;
+    right: 7vw;
+  }
+
+  .tool-premiere {
+    top: 84vh;
+    left: 28vw;
+  }
+
+  .tool-video {
+    bottom: 16vh;
+    left: 7vw;
+  }
+
+  .tool-brush {
+    right: 35vw;
+    bottom: 7vh;
+  }
+
+  .tool-edge-html {
+    right: 5vw;
+    top: 8vh;
+  }
+
+  .tool-edge-js {
+    right: 5vw;
+    bottom: 6vh;
+  }
+}
+
+@keyframes devToolPulse {
+  0%, 100% {
+    opacity: 0.48;
+  }
+  50% {
+    opacity: 0.78;
+  }
 }
 
 .hero-badge {
@@ -668,15 +1172,16 @@ body::before {
 }
 
 .social-links a {
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.32);
   color: #fff;
   background: rgba(255,255,255,0.03);
+  font-size: 1.1rem;
   transition: 0.3s ease;
   margin-right: 10px;
 }
@@ -699,7 +1204,7 @@ body::before {
 
 .footer-contact-social {
   justify-content: flex-start;
-  gap: 16px;
+  gap: 18px;
   margin-top: 16px;
 }
 
@@ -1270,6 +1775,34 @@ body::before {
 
 .legal-contact p:last-child {
   margin-bottom: 0;
+}
+
+.stat-box,
+.tech-card,
+.mockup-block,
+.floating-mini,
+.service-card,
+.feature-card,
+.contact-card,
+.why-box,
+.cta-box,
+.demo-showcase,
+.demo-site-card,
+.demo-site-image-wrap,
+.package-card,
+.package-image-wrap,
+.legal-document,
+.legal-contact {
+  border-color: var(--card-border);
+}
+
+.stat-box:hover,
+.service-card:hover,
+.feature-card:hover,
+.contact-card:hover,
+.demo-site-card:hover,
+.package-card:hover {
+  border-color: var(--card-border-strong);
 }
 
 .footer-legal-links {
