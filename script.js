@@ -1,64 +1,38 @@
-// Page loader and terminal intro sequence
+// Optional background audio toggle
 const pageLoader = document.querySelector(".page-loader");
-const terminalIntro = document.querySelector("[data-terminal-intro]");
-const terminalLines = document.querySelector("[data-terminal-lines]");
-const terminalMoveButton = document.querySelector("[data-terminal-move]");
-const lightSpeedTransition = document.querySelector("[data-light-speed]");
-const lightSpeedVideo = document.querySelector("[data-light-speed-video]");
 const backgroundAudio = document.querySelector("#backgroundAudio");
 const musicToggle = document.querySelector("[data-music-toggle]");
-const introReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-const tunnelFadeDuration = 1350;
-
-let tunnelLeaveTimer = null;
-let tunnelCompleteTimer = null;
-let tunnelRevealStarted = false;
-let tunnelRevealStartedAt = 0;
-let terminalIntroStarted = false;
-let terminalLaunchStarted = false;
 let musicFadeFrame = null;
-let musicPlayPending = false;
-let requestedMusicVolume = 0;
-let requestedMusicFadeDuration = 0;
-const terminalTypeTimers = new Set();
-const musicIntroVolume = 0.12;
 const musicHomeVolume = 0.22;
 
-if (backgroundAudio) {
-  backgroundAudio.preload = "auto";
-  backgroundAudio.load();
-}
+function hidePageLoader() {
+  if (!pageLoader) return;
 
-function unlockIntroContent() {
-  document.body.classList.remove("intro-active");
-  document.body.classList.remove("intro-revealing");
-  document.body.classList.add("intro-complete");
-  revealOnScroll();
-}
+  let loaderFinished = false;
 
-function setTerminalMoveReady(isReady) {
-  if (!terminalMoveButton) return;
+  function removeLoader() {
+    if (loaderFinished) return;
 
-  terminalMoveButton.disabled = !isReady;
-  terminalMoveButton.classList.toggle("is-ready", isReady);
-
-  if (isReady) {
-    playBackgroundMusic(musicIntroVolume, 1200);
+    loaderFinished = true;
+    pageLoader.remove();
   }
+
+  window.setTimeout(() => {
+    pageLoader.classList.add("loaded");
+    pageLoader.addEventListener("transitionend", removeLoader, { once: true });
+    window.setTimeout(removeLoader, 850);
+  }, 250);
 }
+
+window.addEventListener("load", hidePageLoader);
 
 function updateMusicToggle(isPlaying) {
   if (!musicToggle) return;
 
   const icon = musicToggle.querySelector("i");
-  const label = isPlaying
-    ? "Pause background music"
-    : musicPlayPending
-      ? "Start background music"
-      : "Play background music";
+  const label = isPlaying ? "Pause background music" : "Play background music";
 
   musicToggle.classList.toggle("is-playing", isPlaying);
-  musicToggle.classList.toggle("needs-action", !isPlaying && musicPlayPending);
   musicToggle.setAttribute("aria-label", label);
   musicToggle.setAttribute("title", label);
 
@@ -90,10 +64,6 @@ function fadeBackgroundMusic(targetVolume, duration = 1800) {
 async function playBackgroundMusic(volume = musicHomeVolume, fadeDuration = 0) {
   if (!backgroundAudio) return;
 
-  requestedMusicVolume = volume;
-  requestedMusicFadeDuration = fadeDuration;
-  backgroundAudio.muted = false;
-
   if (fadeDuration > 0) {
     backgroundAudio.volume = Math.min(backgroundAudio.volume, volume);
   } else {
@@ -105,364 +75,25 @@ async function playBackgroundMusic(volume = musicHomeVolume, fadeDuration = 0) {
     if (backgroundAudio.paused) {
       await backgroundAudio.play();
     }
-    musicPlayPending = false;
     if (fadeDuration > 0) {
       fadeBackgroundMusic(volume, fadeDuration);
     }
     updateMusicToggle(true);
   } catch (error) {
-    musicPlayPending = true;
     updateMusicToggle(false);
   }
-}
-
-function retryPendingBackgroundMusic() {
-  if (!musicPlayPending || !backgroundAudio || !backgroundAudio.paused) return;
-
-  playBackgroundMusic(requestedMusicVolume || musicHomeVolume, requestedMusicFadeDuration);
-}
-
-function handleBackgroundMusicUnlock(event) {
-  if (!musicPlayPending) return;
-
-  const target = event.target;
-
-  if (target instanceof Element && target.closest("[data-music-toggle]")) {
-    return;
-  }
-
-  retryPendingBackgroundMusic();
-}
-
-function scheduleTerminalTask(callback, delay) {
-  const timer = window.setTimeout(() => {
-    terminalTypeTimers.delete(timer);
-    callback();
-  }, delay);
-
-  terminalTypeTimers.add(timer);
-  return timer;
-}
-
-function waitTerminal(delay) {
-  return new Promise((resolve) => {
-    scheduleTerminalTask(resolve, delay);
-  });
-}
-
-function clearIntroTimers() {
-  window.clearTimeout(tunnelLeaveTimer);
-  window.clearTimeout(tunnelCompleteTimer);
-
-  terminalTypeTimers.forEach((timer) => window.clearTimeout(timer));
-  terminalTypeTimers.clear();
-}
-
-function cleanupTunnelVideoListeners() {
-  if (!lightSpeedVideo) return;
-
-  lightSpeedVideo.removeEventListener("timeupdate", handleTunnelTimeUpdate);
-  lightSpeedVideo.removeEventListener("ended", handleTunnelEnded);
-}
-
-function makeTerminalSpan(className, text) {
-  const span = document.createElement("span");
-
-  span.className = className;
-  span.textContent = text;
-
-  return span;
-}
-
-async function typeTerminalLine({ prefixClass, prefixText, textClass = "terminal-command", text, speed = 12, pause = 120 }) {
-  if (!terminalLines || terminalLaunchStarted) return;
-
-  const line = document.createElement("p");
-  const textSpan = makeTerminalSpan(textClass, "");
-  const cursor = document.createElement("span");
-
-  line.className = "terminal-line";
-  cursor.className = "terminal-cursor";
-  cursor.setAttribute("aria-hidden", "true");
-
-  if (prefixText) {
-    line.appendChild(makeTerminalSpan(prefixClass, prefixText));
-    line.appendChild(document.createTextNode(" "));
-  }
-
-  line.appendChild(textSpan);
-  line.appendChild(cursor);
-  terminalLines.appendChild(line);
-
-  window.requestAnimationFrame(() => {
-    line.classList.add("is-visible");
-  });
-
-  await waitTerminal(90);
-
-  for (const character of text) {
-    if (terminalLaunchStarted) return;
-
-    textSpan.textContent += character;
-    await waitTerminal(introReducedMotion.matches ? 1 : speed);
-  }
-
-  cursor.remove();
-  await waitTerminal(introReducedMotion.matches ? 25 : pause);
-}
-
-async function typeTerminalSequence() {
-  if (!terminalLines) return;
-
-  terminalLines.innerHTML = "";
-
-  await typeTerminalLine({
-    prefixClass: "terminal-prompt",
-    prefixText: "sentron@tech:~$",
-    text: "./launch --digital-presence",
-    speed: 12,
-    pause: 160
-  });
-  await typeTerminalLine({
-    prefixClass: "terminal-ok",
-    prefixText: "[OK]",
-    textClass: "terminal-status-text",
-    text: "Sentron core modules mounted",
-    speed: 8,
-    pause: 90
-  });
-  await typeTerminalLine({
-    prefixClass: "terminal-ok",
-    prefixText: "[OK]",
-    textClass: "terminal-status-text",
-    text: "Tunnel media synchronized",
-    speed: 8,
-    pause: 90
-  });
-  await typeTerminalLine({
-    prefixClass: "terminal-prompt",
-    prefixText: "sentron@tech:~$",
-    text: "Sentron Tech Exploration Loading...",
-    speed: 13,
-    pause: 140
-  });
-}
-
-function getTunnelDurationMs() {
-  const fallbackDuration = 5600;
-
-  if (
-    lightSpeedVideo &&
-    Number.isFinite(lightSpeedVideo.duration) &&
-    lightSpeedVideo.duration > 0
-  ) {
-    return Math.max(lightSpeedVideo.duration * 1000, 4800);
-  }
-
-  return fallbackDuration;
-}
-
-function startTunnelPageReveal() {
-  if (tunnelRevealStarted) return;
-
-  tunnelRevealStarted = true;
-  tunnelRevealStartedAt = performance.now();
-  document.body.classList.add("intro-revealing");
-  lightSpeedTransition?.classList.add("is-landing");
-}
-
-function finishTunnelAfterEnd() {
-  startTunnelPageReveal();
-  window.clearTimeout(tunnelLeaveTimer);
-  window.clearTimeout(tunnelCompleteTimer);
-  lightSpeedTransition?.classList.add("is-leaving");
-
-  const elapsedFadeTime = performance.now() - tunnelRevealStartedAt;
-  const remainingFadeTime = Math.max(920, tunnelFadeDuration - elapsedFadeTime + 260);
-
-  tunnelCompleteTimer = window.setTimeout(completeSentronLaunch, remainingFadeTime);
-}
-
-function handleTunnelTimeUpdate() {
-  if (
-    !lightSpeedVideo ||
-    !Number.isFinite(lightSpeedVideo.duration) ||
-    lightSpeedVideo.duration <= 0
-  ) {
-    return;
-  }
-
-  const remainingTime = lightSpeedVideo.duration - lightSpeedVideo.currentTime;
-
-  if (remainingTime <= tunnelFadeDuration / 1000) {
-    startTunnelPageReveal();
-  }
-}
-
-function handleTunnelEnded() {
-  finishTunnelAfterEnd();
-}
-
-function scheduleTunnelReveal({ useVideoEvents = false } = {}) {
-  if (introReducedMotion.matches) {
-    tunnelCompleteTimer = window.setTimeout(completeSentronLaunch, 450);
-    return;
-  }
-
-  const tunnelDuration = getTunnelDurationMs();
-  const fadeStart = Math.max(1800, tunnelDuration - tunnelFadeDuration);
-
-  if (lightSpeedTransition) {
-    lightSpeedTransition.style.setProperty("--tunnel-duration", `${tunnelDuration}ms`);
-    lightSpeedTransition.style.setProperty("--tunnel-line-duration", `${Math.max(2800, tunnelDuration - 420)}ms`);
-    lightSpeedTransition.style.setProperty("--tunnel-landing-duration", `${tunnelFadeDuration}ms`);
-  }
-
-  if (useVideoEvents) {
-    tunnelLeaveTimer = window.setTimeout(startTunnelPageReveal, fadeStart);
-    tunnelCompleteTimer = window.setTimeout(finishTunnelAfterEnd, tunnelDuration + 1200);
-    return;
-  }
-
-  tunnelLeaveTimer = window.setTimeout(startTunnelPageReveal, fadeStart);
-  tunnelCompleteTimer = window.setTimeout(finishTunnelAfterEnd, tunnelDuration + 180);
-}
-
-function completeSentronLaunch() {
-  cleanupTunnelVideoListeners();
-
-  if (lightSpeedVideo) {
-    lightSpeedVideo.pause();
-  }
-
-  if (terminalIntro) {
-    terminalIntro.remove();
-  }
-
-  if (lightSpeedTransition) {
-    lightSpeedTransition.classList.remove("is-active");
-    lightSpeedTransition.remove();
-  }
-
-  unlockIntroContent();
-  playBackgroundMusic(musicHomeVolume, 3200);
-}
-
-function launchSentronIntro() {
-  if (terminalLaunchStarted) return;
-
-  terminalLaunchStarted = true;
-  clearIntroTimers();
-  tunnelRevealStarted = false;
-  tunnelRevealStartedAt = 0;
-
-  if (terminalMoveButton) {
-    terminalMoveButton.disabled = true;
-    terminalMoveButton.classList.remove("is-ready");
-  }
-
-  if (lightSpeedTransition) {
-    lightSpeedTransition.classList.remove("is-landing", "is-leaving");
-    lightSpeedTransition.classList.add("is-active");
-  }
-
-  playBackgroundMusic(musicIntroVolume, 900);
-
-  if (lightSpeedVideo && !introReducedMotion.matches) {
-    cleanupTunnelVideoListeners();
-    lightSpeedVideo.addEventListener("timeupdate", handleTunnelTimeUpdate);
-    lightSpeedVideo.addEventListener("ended", handleTunnelEnded);
-
-    try {
-      lightSpeedVideo.currentTime = 0;
-    } catch (error) {
-      // Some browsers block seeking before metadata is available; playback can still start.
-    }
-
-    lightSpeedVideo.play().catch(() => {
-      lightSpeedTransition?.classList.add("video-fallback");
-    });
-  }
-
-  window.setTimeout(() => {
-    if (terminalIntro) {
-      terminalIntro.classList.add("is-launching");
-    }
-  }, introReducedMotion.matches ? 0 : 220);
-
-  if (lightSpeedVideo && !introReducedMotion.matches && !Number.isFinite(lightSpeedVideo.duration)) {
-    lightSpeedVideo.addEventListener("loadedmetadata", () => {
-      window.clearTimeout(tunnelLeaveTimer);
-      window.clearTimeout(tunnelCompleteTimer);
-      scheduleTunnelReveal({ useVideoEvents: true });
-    }, { once: true });
-  }
-
-  scheduleTunnelReveal({ useVideoEvents: Boolean(lightSpeedVideo && !introReducedMotion.matches) });
-}
-
-async function startTerminalIntro() {
-  if (terminalIntroStarted) return;
-
-  terminalIntroStarted = true;
-
-  if (!terminalIntro) {
-    unlockIntroContent();
-    return;
-  }
-
-  if (lightSpeedVideo && !introReducedMotion.matches) {
-    lightSpeedVideo.load();
-  }
-
-  setTerminalMoveReady(false);
-  await typeTerminalSequence();
-  await waitTerminal(introReducedMotion.matches ? 40 : 120);
-  setTerminalMoveReady(true);
-}
-
-function hidePageLoaderThenStartIntro() {
-  if (!pageLoader) {
-    startTerminalIntro();
-    return;
-  }
-
-  let loaderFinished = false;
-
-  function finishLoader() {
-    if (loaderFinished) return;
-
-    loaderFinished = true;
-    pageLoader.remove();
-    startTerminalIntro();
-  }
-
-  window.setTimeout(() => {
-    pageLoader.classList.add("loaded");
-    pageLoader.addEventListener("transitionend", finishLoader, { once: true });
-    window.setTimeout(finishLoader, 850);
-  }, 350);
-}
-
-if (terminalMoveButton) {
-  terminalMoveButton.addEventListener("click", launchSentronIntro);
 }
 
 if (musicToggle && backgroundAudio) {
   updateMusicToggle(false);
 
   backgroundAudio.addEventListener("play", () => {
-    if (!backgroundAudio.muted && backgroundAudio.volume > 0) {
-      musicPlayPending = false;
-      updateMusicToggle(true);
-    }
+    updateMusicToggle(true);
   });
 
   backgroundAudio.addEventListener("pause", () => {
     updateMusicToggle(false);
   });
-
-  backgroundAudio.addEventListener("canplay", retryPendingBackgroundMusic);
 
   musicToggle.addEventListener("click", () => {
     if (backgroundAudio.paused) {
@@ -475,13 +106,6 @@ if (musicToggle && backgroundAudio) {
     updateMusicToggle(false);
   });
 }
-
-document.addEventListener("pointerdown", handleBackgroundMusicUnlock, { capture: true, passive: true });
-document.addEventListener("keydown", handleBackgroundMusicUnlock, { capture: true });
-
-window.addEventListener("load", () => {
-  hidePageLoaderThenStartIntro();
-});
 
 // Navbar shadow on scroll
 const navbar = document.querySelector(".navbar");
@@ -531,7 +155,7 @@ if (digitalDotsBg) {
   let dotResizeTimer = null;
 
   function shouldShowDots() {
-    return window.innerWidth >= 768 && !document.body.classList.contains("intro-active");
+    return window.innerWidth >= 768;
   }
 
   function buildDigitalDots() {
@@ -669,19 +293,18 @@ if (digitalDotsBg) {
 }
 
 // Copy to clipboard functionality
-document.querySelectorAll('.copy-btn').forEach(btn => {
-  btn.addEventListener('click', async () => {
-    const text = btn.getAttribute('data-copy');
+document.querySelectorAll(".copy-btn").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    const text = btn.getAttribute("data-copy");
     try {
       await navigator.clipboard.writeText(text);
-      // Temporarily change icon to checkmark
-      const icon = btn.querySelector('i');
-      icon.className = 'fa-solid fa-check';
+      const icon = btn.querySelector("i");
+      icon.className = "fa-solid fa-check";
       setTimeout(() => {
-        icon.className = 'fa-solid fa-copy';
+        icon.className = "fa-solid fa-copy";
       }, 2000);
     } catch (err) {
-      console.error('Failed to copy: ', err);
+      console.error("Failed to copy: ", err);
     }
   });
 });
