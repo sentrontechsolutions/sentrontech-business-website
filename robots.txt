@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sentrontech.online/sitemap.xml
+Sitemap: https://www.sentrontech.online/sitemap.xml
