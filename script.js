@@ -137,124 +137,167 @@ function revealOnScroll() {
 window.addEventListener("scroll", revealOnScroll);
 window.addEventListener("load", revealOnScroll);
 
-// Digital dots background motion
+// Digital ash background motion
 const digitalDotsBg = document.querySelector(".digital-dots-bg");
 const dotsReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 if (digitalDotsBg) {
-  const dotPointer = {
+  const ashPointer = {
     x: -9999,
     y: -9999,
     active: false
   };
 
-  let dotStates = [];
-  let lastDotScrollY = window.scrollY;
-  let dotScrollDrift = 0;
-  let targetDotScrollDrift = 0;
-  let dotResizeTimer = null;
+  let ashStates = [];
+  let lastAshScrollY = window.scrollY;
+  let ashScrollLift = 0;
+  let targetAshScrollLift = 0;
+  let ashResizeTimer = null;
+  let lastAshFrame = 0;
 
   function shouldShowDots() {
-    return window.innerWidth >= 768;
+    return true;
+  }
+
+  function randomBetween(min, max) {
+    return min + Math.random() * (max - min);
+  }
+
+  function resetAshPiece(state, width, height, initial = false) {
+    state.baseX = randomBetween(-28, width + 28);
+    state.baseY = initial ? randomBetween(0, height + 80) : randomBetween(height + 18, height + 130);
+    state.phase = Math.random() * Math.PI * 2;
+    state.depth = randomBetween(0.62, 1.34);
+    state.riseSpeed = randomBetween(18, 54);
+    state.sway = randomBetween(7, 24);
+    state.swaySpeed = randomBetween(0.0009, 0.0022);
+    state.airDrift = randomBetween(-6, 6);
+    state.rotation = randomBetween(0, 360);
+    state.spinSpeed = randomBetween(-52, 52);
+    state.repelX = 0;
+    state.repelY = 0;
+    state.repelVX = 0;
+    state.repelVY = 0;
   }
 
   function buildDigitalDots() {
     digitalDotsBg.innerHTML = "";
-    dotStates = [];
+    ashStates = [];
+    lastAshFrame = 0;
 
     if (!shouldShowDots()) return;
 
     const width = window.innerWidth;
     const height = window.innerHeight;
-    const count = Math.min(460, Math.max(260, Math.round((width * height) / 3900)));
-    const columns = Math.ceil(Math.sqrt(count * (width / height)));
-    const rows = Math.ceil(count / columns);
-    const cellWidth = width / columns;
-    const cellHeight = height / rows;
+    const isCompactScreen = width < 768;
+    const minCount = isCompactScreen ? 120 : 230;
+    const maxCount = isCompactScreen ? 260 : 430;
+    const density = isCompactScreen ? 3200 : 4600;
+    const count = Math.min(maxCount, Math.max(minCount, Math.round((width * height) / density)));
 
     for (let index = 0; index < count; index += 1) {
-      const column = index % columns;
-      const row = Math.floor(index / columns);
-      const x = (column + 0.18 + Math.random() * 0.64) * cellWidth;
-      const y = (row + 0.18 + Math.random() * 0.64) * cellHeight;
-      const sizeRoll = Math.random();
-      let size = 2.4 + Math.random() * 1.4;
+      const isSquare = Math.random() < 0.36;
+      const pieceWidth = isSquare ? randomBetween(4, 8.5) : randomBetween(3.5, 7);
+      const pieceHeight = isSquare ? pieceWidth : randomBetween(9, 22);
+      const ash = document.createElement("span");
+      const state = {
+        ash,
+        width: pieceWidth,
+        height: pieceHeight
+      };
 
-      if (sizeRoll > 0.55) {
-        size = 4 + Math.random() * 1.8;
-      }
+      ash.className = "digital-ash";
+      ash.style.setProperty("--ash-width", `${pieceWidth.toFixed(2)}px`);
+      ash.style.setProperty("--ash-height", `${pieceHeight.toFixed(2)}px`);
+      ash.style.setProperty("--ash-alpha", randomBetween(0.36, 0.72).toFixed(2));
+      ash.style.setProperty("--ash-pulse-duration", `${randomBetween(2.4, 5.8).toFixed(2)}s`);
+      ash.style.animationDelay = `${(-Math.random() * 6).toFixed(2)}s`;
+      digitalDotsBg.appendChild(ash);
 
-      if (sizeRoll > 0.82) {
-        size = 6.2 + Math.random() * 2.2;
-      }
-
-      if (sizeRoll > 0.95) {
-        size = 9 + Math.random() * 2.8;
-      }
-      const dot = document.createElement("span");
-
-      dot.className = "digital-dot";
-      dot.style.left = `${x.toFixed(2)}px`;
-      dot.style.top = `${y.toFixed(2)}px`;
-      dot.style.setProperty("--dot-size", `${size.toFixed(2)}px`);
-      dot.style.setProperty("--dot-alpha", (0.2 + Math.random() * 0.2).toFixed(2));
-      dot.style.setProperty("--dot-pulse-duration", `${(3.6 + Math.random() * 3.8).toFixed(2)}s`);
-      dot.style.animationDelay = `${(-Math.random() * 6).toFixed(2)}s`;
-      digitalDotsBg.appendChild(dot);
-
-      dotStates.push({
-        dot,
-        baseX: x,
-        baseY: y,
-        phase: Math.random() * Math.PI * 2,
-        depth: 0.55 + Math.random() * 0.65,
-        repelX: 0,
-        repelY: 0
-      });
+      resetAshPiece(state, width, height, true);
+      ashStates.push(state);
     }
   }
 
   function animateDigitalDots(time) {
     if (!shouldShowDots()) {
-      if (dotStates.length) buildDigitalDots();
+      if (ashStates.length) buildDigitalDots();
       window.requestAnimationFrame(animateDigitalDots);
       return;
     }
 
-    if (!dotStates.length) buildDigitalDots();
+    if (!ashStates.length) buildDigitalDots();
 
-    targetDotScrollDrift *= 0.88;
-    dotScrollDrift += (targetDotScrollDrift - dotScrollDrift) * 0.22;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const elapsed = lastAshFrame ? Math.min(48, time - lastAshFrame) : 16.7;
+    const deltaSeconds = elapsed / 1000;
 
-    dotStates.forEach((state) => {
-      const idleX = Math.sin(time * 0.00058 + state.phase) * (2.8 + state.depth * 3.6);
-      const idleY = Math.cos(time * 0.00052 + state.phase) * (3.2 + state.depth * 4.2);
-      const driftY = dotScrollDrift * state.depth;
-      const centerX = state.baseX + idleX;
-      const centerY = state.baseY + idleY + driftY;
-      const deltaX = centerX - dotPointer.x;
-      const deltaY = centerY - dotPointer.y;
+    lastAshFrame = time;
+
+    targetAshScrollLift *= 0.9;
+    ashScrollLift += (targetAshScrollLift - ashScrollLift) * 0.18;
+
+    ashStates.forEach((state) => {
+      if (!dotsReducedMotion.matches) {
+        state.baseY -= (state.riseSpeed * state.depth * deltaSeconds) + Math.max(0, ashScrollLift) * 0.04;
+        state.baseX += state.airDrift * deltaSeconds;
+      }
+
+      if (
+        state.baseY < -150 ||
+        state.baseX < -120 ||
+        state.baseX > width + 120
+      ) {
+        resetAshPiece(state, width, height);
+      }
+
+      const swayX = Math.sin(time * state.swaySpeed + state.phase) * state.sway;
+      const flameX = Math.sin(time * state.swaySpeed * 2.25 + state.phase * 1.7) * state.sway * 0.38;
+      const flameY = Math.cos(time * state.swaySpeed * 1.35 + state.phase) * 5 * state.depth;
+      const centerX = state.baseX + swayX + flameX + state.repelX + state.width / 2;
+      const centerY = state.baseY + flameY - ashScrollLift * state.depth + state.repelY + state.height / 2;
+      const deltaX = centerX - ashPointer.x;
+      const deltaY = centerY - ashPointer.y;
       const distance = Math.hypot(deltaX, deltaY) || 1;
-      const repelRadius = 92;
-      const repelPower = dotPointer.active && distance < repelRadius
+      const repelRadius = 144;
+      const repelPower = ashPointer.active && distance < repelRadius
         ? Math.pow(1 - distance / repelRadius, 2)
         : 0;
-      const push = 62 * repelPower;
-      const targetRepelX = (deltaX / distance) * push;
-      const targetRepelY = (deltaY / distance) * push;
-
-      state.repelX += (targetRepelX - state.repelX) * 0.32;
-      state.repelY += (targetRepelY - state.repelY) * 0.32;
+      const tangentX = -deltaY / distance;
+      const tangentY = deltaX / distance;
+      const step = Math.sin(time * 0.018 + state.phase) * repelPower;
 
       if (dotsReducedMotion.matches) {
-        state.dot.style.transform = "translate3d(0, 0, 0)";
+        state.ash.style.transform = `translate3d(${state.baseX.toFixed(2)}px, ${state.baseY.toFixed(2)}px, 0)`;
         return;
       }
 
-      const moveX = idleX + state.repelX;
-      const moveY = idleY + driftY + state.repelY;
+      state.repelVX += ((deltaX / distance) * 1550 + tangentX * step * 760) * repelPower * deltaSeconds;
+      state.repelVY += ((deltaY / distance) * 1550 + tangentY * step * 760) * repelPower * deltaSeconds;
+      state.repelVX *= Math.pow(0.82, elapsed / 16.7);
+      state.repelVY *= Math.pow(0.82, elapsed / 16.7);
+      state.repelX += state.repelVX * deltaSeconds;
+      state.repelY += state.repelVY * deltaSeconds;
+      state.repelX += (0 - state.repelX) * 0.018;
+      state.repelY += (0 - state.repelY) * 0.018;
 
-      state.dot.style.transform = `translate3d(${moveX.toFixed(2)}px, ${moveY.toFixed(2)}px, 0)`;
+      const repelDistance = Math.hypot(state.repelX, state.repelY);
+      const maxRepelDistance = 132;
+
+      if (repelDistance > maxRepelDistance) {
+        const clamp = maxRepelDistance / repelDistance;
+        state.repelX *= clamp;
+        state.repelY *= clamp;
+        state.repelVX *= 0.62;
+        state.repelVY *= 0.62;
+      }
+
+      const moveX = state.baseX + swayX + flameX + state.repelX;
+      const moveY = state.baseY + flameY - ashScrollLift * state.depth + state.repelY;
+      const rotation = state.rotation + time * 0.001 * state.spinSpeed + state.repelX * 0.34;
+
+      state.ash.style.transform = `translate3d(${moveX.toFixed(2)}px, ${moveY.toFixed(2)}px, 0) rotate(${rotation.toFixed(2)}deg)`;
     });
 
     window.requestAnimationFrame(animateDigitalDots);
@@ -263,30 +306,30 @@ if (digitalDotsBg) {
   buildDigitalDots();
 
   window.addEventListener("resize", () => {
-    window.clearTimeout(dotResizeTimer);
-    dotResizeTimer = window.setTimeout(buildDigitalDots, 120);
+    window.clearTimeout(ashResizeTimer);
+    ashResizeTimer = window.setTimeout(buildDigitalDots, 120);
   });
   window.addEventListener("pointermove", (event) => {
-    dotPointer.x = event.clientX;
-    dotPointer.y = event.clientY;
-    dotPointer.active = true;
+    ashPointer.x = event.clientX;
+    ashPointer.y = event.clientY;
+    ashPointer.active = true;
   }, { passive: true });
   window.addEventListener("pointerleave", () => {
-    dotPointer.active = false;
+    ashPointer.active = false;
   });
   document.addEventListener("mouseleave", () => {
-    dotPointer.active = false;
+    ashPointer.active = false;
   });
   window.addEventListener("scroll", () => {
-    const delta = window.scrollY - lastDotScrollY;
+    const delta = window.scrollY - lastAshScrollY;
     const direction = Math.sign(delta);
     const distance = Math.abs(delta);
 
     if (direction !== 0) {
-      targetDotScrollDrift = Math.max(-24, Math.min(24, direction * Math.min(24, distance * 0.28)));
+      targetAshScrollLift = Math.max(-22, Math.min(28, direction * Math.min(28, distance * 0.22)));
     }
 
-    lastDotScrollY = window.scrollY;
+    lastAshScrollY = window.scrollY;
   }, { passive: true });
 
   window.requestAnimationFrame(animateDigitalDots);
