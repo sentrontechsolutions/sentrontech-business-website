@@ -19,7 +19,7 @@
     <meta property="og:description"
         content="Modern web development, UI/UX design, digital branding, and AI-powered visual content services for businesses in Sri Lanka." />
     <meta property="og:url" content="https://www.sentrontech.online/" />
-    <meta property="og:image" content="https://www.sentrontech.online/assets/logo.png" />
+    <meta property="og:image" content="https://www.sentrontech.online/assets/og-image.png" />
     <meta property="og:image:alt" content="Sentron Tech Solutions branded web design and AI creative services preview" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -37,7 +37,7 @@
 
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="dns-prefetch" href="//images.unsplash.com">
+    <link rel="preconnect" href="https://formspree.io" crossorigin>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -46,7 +46,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
 
     <script type="application/ld+json">
         {
@@ -138,15 +138,6 @@
 </head>
 
 <body>
-    <div class="page-loader" role="status" aria-label="Loading Sentron Tech Solutions">
-        <div class="loader-mark" aria-hidden="true">
-            <div class="loader-logo">
-                <img src="assets/logo.png" alt="">
-            </div>
-            <span class="loader-text">Loading</span>
-        </div>
-    </div>
-
     <div class="digital-dots-bg" aria-hidden="true"></div>
 
     <!-- Navbar -->
@@ -168,8 +159,9 @@
                 <ul class="navbar-nav ms-auto align-items-lg-center">
                     <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#portfolio">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#packages">Packages</a></li>
                     <li class="nav-item"><a class="nav-link" href="#why-us">Why Us</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#packages">Our Packages</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
                         <a href="#contact" class="btn btn-glow px-4 py-2">Get Started</a>
@@ -182,106 +174,88 @@
     <main>
 
     <!-- Hero -->
-    <section class="hero-section" id="home">
+    <section class="hero-section enterprise-hero" id="home" aria-labelledby="home-title">
         <div class="glow-orb orb-1"></div>
         <div class="glow-orb orb-2"></div>
         <div class="glow-orb orb-3"></div>
+        <div class="hero-gradient-field" aria-hidden="true"></div>
 
         <div class="container">
             <div class="row align-items-center g-5">
-                <div class="col-lg-6">
-                    <div class="reveal-left active">
-
+                <div class="col-lg-7">
+                    <div class="hero-copy reveal-left active">
                         <div class="hero-badge">
-                            <i class="fa-solid fa-bolt"></i>
-                            Build . Design . Grow
+                            <i class="fa-solid fa-sparkles"></i>
+                            Sri Lanka based digital solutions studio
                         </div>
 
-                        <h1 class="hero-title">
-                            Build a <span class="gradient-text">Powerful Digital Presence</span> with Sentron
+                        <h1 class="hero-title" id="home-title">
+                            Businesses lose attention online.
+                            <span class="gradient-text">Sentron builds the system that earns it.</span>
                         </h1>
 
-                        <p class="hero-text">
-                            Sentron Tech Solutions is a modern digital solutions company specializing in web
-                            development,
-                            UI/UX design, and AI-powered image creation. We help businesses build a strong online
-                            presence through responsive websites, creative designs, and high-quality digital content
-                            tailored for growth and visibility.
+                        <p class="typewriter-line" aria-live="polite">
+                            <span class="typewriter-prefix">We create</span>
+                            <span class="typewriter-text" data-typewriter
+                                data-typewriter-phrases='["fast business websites.","clean UI/UX experiences.","AI-powered brand visuals.","digital systems built for growth."]'>fast business websites.</span>
+                        </p>
 
+                        <p class="hero-text">
+                            Sentron Tech Solutions designs lightweight, responsive and conversion-focused digital
+                            experiences for growing businesses. From business websites and UI/UX systems to branded
+                            AI visuals, we help you look credible, load fast, and communicate clearly.
                         </p>
 
                         <div class="d-flex flex-wrap gap-3 justify-content-lg-start justify-content-center">
-                            <a href="#services" class="btn btn-glow px-4 py-3">Explore Services</a>
-                            <a href="#contact" class="btn btn-outline-tech px-4 py-3">Talk to Us</a>
+                            <a href="#services" class="btn btn-glow px-4 py-3">Enter Website</a>
+                            <a href="#contact" class="btn btn-outline-tech px-4 py-3">Get Started</a>
                         </div>
 
-                        <div class="hero-stats">
-                            <div class="stat-box">
-                                <h4>Web</h4>
-                                <p>Modern responsive websites</p>
+                        <div class="hero-metrics" aria-label="Sentron service highlights">
+                            <div class="metric-box">
+                                <span>01</span>
+                                <strong>Web</strong>
+                                <small>Static & business websites</small>
                             </div>
-                            <div class="stat-box">
-                                <h4>UI/UX</h4>
-                                <p>Clean and engaging interfaces</p>
+                            <div class="metric-box">
+                                <span>02</span>
+                                <strong>UI/UX</strong>
+                                <small>User-focused interfaces</small>
                             </div>
-                            <div class="stat-box">
-                                <h4>AI Design</h4>
-                                <p>Creative digital visual content</p>
+                            <div class="metric-box">
+                                <span>03</span>
+                                <strong>AI Media</strong>
+                                <small>Brand visuals & promos</small>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-6">
-                    <div class="hero-visual reveal-right active">
-                        <div class="tech-card">
-                            <div class="screen-header">
-                                <span class="screen-dot"></span>
-                                <span class="screen-dot"></span>
-                                <span class="screen-dot"></span>
-                            </div>
-
-                            <div class="mockup-block">
-                                <div class="mockup-line large"></div>
-                                <div class="mockup-line medium"></div>
-                                <div class="mockup-line small"></div>
-                            </div>
-
-                            <div class="row g-3">
-                                <div class="col-6">
-                                    <div class="mockup-block h-100">
-                                        <div class="service-icon mb-3">
-                                            <i class="fa-solid fa-code"></i>
-                                        </div>
-                                        <div class="mockup-line medium"></div>
-                                        <div class="mockup-line small"></div>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="mockup-block h-100">
-                                        <div class="service-icon mb-3">
-                                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                                        </div>
-                                        <div class="mockup-line medium"></div>
-                                        <div class="mockup-line small"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mockup-block mb-0 mt-3">
-                                <div class="mockup-line large"></div>
-                                <div class="mockup-line large"></div>
-                                <div class="mockup-line medium"></div>
+                <div class="col-lg-5">
+                    <aside class="welcome-glass-card reveal-right active" aria-label="Welcome to Sentron Tech Solutions">
+                        <div class="welcome-card-gradient" aria-hidden="true"></div>
+                        <div class="welcome-brand-row">
+                            <img src="assets/logo.png" alt="Sentron Tech Solutions logo" width="72" height="72" loading="eager" decoding="async">
+                            <div>
+                                <span class="welcome-eyebrow">Welcome Visitor</span>
+                                <h2>Start with a sharper digital presence.</h2>
                             </div>
                         </div>
-
-                        <div class="floating-mini one">
-                            <i class="fa-solid fa-globe me-2 text-info"></i> Tech-Powered Branding
+                        <p>
+                            Choose a clean, fast and professional web experience that makes your business easier to trust,
+                            easier to understand, and easier to contact.
+                        </p>
+                        <div class="welcome-chip-grid" aria-label="Available solutions">
+                            <span><i class="fa-solid fa-code"></i> Websites</span>
+                            <span><i class="fa-solid fa-pen-nib"></i> UI/UX</span>
+                            <span><i class="fa-solid fa-wand-magic-sparkles"></i> AI Visuals</span>
+                            <span><i class="fa-solid fa-bullhorn"></i> Branding</span>
                         </div>
-                        <div class="floating-mini two">
-                            <i class="fa-solid fa-layer-group me-2 text-info"></i> Smart Design Systems
+                        <div class="welcome-actions">
+                            <a href="#services" class="btn btn-glow px-4 py-3">Explore Services</a>
+                            <a href="#contact" class="welcome-link">Discuss a project <i class="fa-solid fa-arrow-right"></i></a>
                         </div>
-                    </div>
+                    </aside>
                 </div>
             </div>
         </div>
@@ -386,7 +360,7 @@
         </div>
 
         <!-- Demo Projects -->
-        <div class="demo-showcase reveal">
+        <div class="demo-showcase reveal" id="portfolio">
             <div class="demo-showcase-header text-center">
                 <span class="demo-badge">Live Demo Projects</span>
                 <h3>Explore a Few Demo Projects We Have Built</h3>
@@ -399,46 +373,84 @@
             <div class="demo-category">
                 <h4 class="demo-category-title">Web Development</h4>
                 <div class="row g-4 mt-1">
-                    <div class="col-md-6">
-                        <a href="https://mednovademo.netlify.app" class="demo-site-card" target="_blank"
+                    <div class="col-sm-6 col-xl-3">
+                        <a href="https://demo-cafe-tree.netlify.app" class="demo-site-card" target="_blank"
                             rel="noopener noreferrer">
-                            <div class="demo-site-image-wrap">
-                                <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80"
-                                    alt="MedNova healthcare website preview" class="demo-site-image" width="1200"
-                                    height="800" loading="lazy" decoding="async">
+                            <div class="demo-site-image-wrap demo-site-preview demo-site-preview--cafe" role="img" aria-label="Cafe Tree website preview">
+                                <span></span><span></span><span></span>
                             </div>
                             <div class="demo-site-top">
                                 <div class="demo-site-icon">
-                                    <i class="fa-solid fa-stethoscope"></i>
+                                    <i class="fa-solid fa-mug-saucer"></i>
                                 </div>
-                                <span class="demo-site-tag">Healthcare Demo</span>
+                                <span class="demo-site-tag">Cafe Demo</span>
                             </div>
-                            <h4>MedNova Demo</h4>
-                            <p>A clean, modern medical website concept designed for trust, clarity, and strong
-                                patient-focused presentation.</p>
+                            <h4>Cafe Tree</h4>
+                            <p>A nature-inspired cafe website with warm storytelling, menu highlights, gallery moments,
+                                and a location-focused customer journey.</p>
                             <span class="demo-site-link">
                                 Visit Website <i class="fa-solid fa-arrow-up-right-from-square"></i>
                             </span>
                         </a>
                     </div>
 
-                    <div class="col-md-6">
-                        <a href="https://luxestaydemo.netlify.app" class="demo-site-card" target="_blank"
+                    <div class="col-sm-6 col-xl-3">
+                        <a href="https://pharmacy-demo-sentrontech.netlify.app" class="demo-site-card" target="_blank"
                             rel="noopener noreferrer">
-                            <div class="demo-site-image-wrap">
-                                <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80"
-                                    alt="LuxeStay hospitality website preview" class="demo-site-image" width="1200"
-                                    height="800" loading="lazy" decoding="async">
+                            <div class="demo-site-image-wrap demo-site-preview demo-site-preview--pharmacy" role="img" aria-label="Medora Prime Pharmacy website preview">
+                                <span></span><span></span><span></span>
                             </div>
                             <div class="demo-site-top">
                                 <div class="demo-site-icon">
-                                    <i class="fa-solid fa-hotel"></i>
+                                    <i class="fa-solid fa-prescription-bottle-medical"></i>
                                 </div>
-                                <span class="demo-site-tag">Hospitality Demo</span>
+                                <span class="demo-site-tag">Pharmacy Demo</span>
                             </div>
-                            <h4>LuxeStay Demo</h4>
-                            <p>A refined hotel and stay booking concept with a premium visual style and a welcoming,
-                                high-end feel.</p>
+                            <h4>Medora Prime Pharmacy</h4>
+                            <p>A calm healthcare retail demo built around pharmacy trust, product discovery,
+                                verification-first ordering, and clear support.</p>
+                            <span class="demo-site-link">
+                                Visit Website <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </span>
+                        </a>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-3">
+                        <a href="https://saloon-demo-sentrontech.netlify.app" class="demo-site-card" target="_blank"
+                            rel="noopener noreferrer">
+                            <div class="demo-site-image-wrap demo-site-preview demo-site-preview--salon" role="img" aria-label="Aurelia Bloom Salon website preview">
+                                <span></span><span></span><span></span>
+                            </div>
+                            <div class="demo-site-top">
+                                <div class="demo-site-icon">
+                                    <i class="fa-solid fa-spa"></i>
+                                </div>
+                                <span class="demo-site-tag">Salon Demo</span>
+                            </div>
+                            <h4>Aurelia Bloom Salon</h4>
+                            <p>A luxury beauty atelier demo for hair, bridal, makeup, spa, nails, and skincare with a
+                                polished premium brand feel.</p>
+                            <span class="demo-site-link">
+                                Visit Website <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </span>
+                        </a>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-3">
+                        <a href="https://demo-central-enterprises.netlify.app" class="demo-site-card" target="_blank"
+                            rel="noopener noreferrer">
+                            <div class="demo-site-image-wrap demo-site-preview demo-site-preview--industrial" role="img" aria-label="Central Enterprises website preview">
+                                <span></span><span></span><span></span>
+                            </div>
+                            <div class="demo-site-top">
+                                <div class="demo-site-icon">
+                                    <i class="fa-solid fa-helmet-safety"></i>
+                                </div>
+                                <span class="demo-site-tag">Industrial Demo</span>
+                            </div>
+                            <h4>Central Enterprises</h4>
+                            <p>An industrial hardware and construction supply website with product categories,
+                                equipment highlights, services, and quote flow.</p>
                             <span class="demo-site-link">
                                 Visit Website <i class="fa-solid fa-arrow-up-right-from-square"></i>
                             </span>
@@ -454,7 +466,7 @@
                         <a href="https://www.behance.net/gallery/247162073/Sentron-Tech-Solutions-Visual-Content-Creation"
                             class="demo-site-card" target="_blank" rel="noopener noreferrer">
                             <div class="demo-site-image-wrap">
-                                <img src="assets/demoProjects/vcontent/p1.png"
+                                <img src="assets/demoProjects/vcontent/p1.webp"
                                     alt="Visual content creation project preview" class="demo-site-image" width="1536"
                                     height="1024" loading="lazy" decoding="async">
                             </div>
@@ -482,7 +494,7 @@
                         <a href="https://www.behance.net/gallery/247389651/T-Shirt-Showcase-Sentron-Tech-Solutions"
                             class="demo-site-card" target="_blank" rel="noopener noreferrer">
                             <div class="demo-site-image-wrap">
-                                <img src="assets/demoProjects/videogen/sentrontech-t-shirt.png"
+                                <img src="assets/demoProjects/videogen/sentrontech-t-shirt.webp"
                                     alt="T-Shirt Showcase project preview" class="demo-site-image" width="1536"
                                     height="1024" loading="lazy" decoding="async">
                             </div>
@@ -504,7 +516,7 @@
                         <a href="https://www.behance.net/gallery/247389949/WrapIT-Car-Sticker-Coming-Soon-Promotional-Video"
                             class="demo-site-card" target="_blank" rel="noopener noreferrer">
                             <div class="demo-site-image-wrap">
-                                <img src="assets/demoProjects/videogen/wrapit.png"
+                                <img src="assets/demoProjects/videogen/wrapit.webp"
                                     alt="WrapIT Car Sticker promotional video preview" class="demo-site-image"
                                     width="1254" height="1254" loading="lazy" decoding="async">
                             </div>
@@ -537,116 +549,97 @@
 
     <!-- Packages -->
     <section class="py-5" id="packages">
-        <div class="container py-5 align-items-center">
-
+        <div class="container py-5">
             <div class="text-center mb-5 reveal">
                 <h2 class="section-title">Our Packages</h2>
                 <p class="section-subtitle">
                     Choose from focused package options crafted for business growth through
-                    high-performance websites and powerful visual content.
+                    high-performance websites, powerful visual content, and launch-ready combo packages.
                 </p>
             </div>
 
-            <!-- Web Development -->
-            <div class="package-group reveal ">
+            <div class="package-group reveal">
                 <div class="package-group-head">
                     <h3>Web Development</h3>
-                    <span>Professional website packages for startup to premium business needs</span>
+                    <span>Professional website package for establishing a strong online presence</span>
                 </div>
 
-                <div class="row g-4">
-
-                    <div class="col-md-4 col-xl-6">
+                <div class="row g-4 justify-content-center">
+                    <div class="col-md-8 col-lg-6 col-xl-5">
                         <div class="package-card">
                             <div class="package-image-wrap">
-                                <img src="assets/packages/web/web-pack.png" alt="Bluemark Pack details"
-                                    class="package-image" width="495" height="474" loading="lazy" decoding="async">
+                                <img src="assets/packages/web/1.png" alt="Web Pack details"
+                                    class="package-image" width="1254" height="1254" loading="lazy" decoding="async">
                             </div>
                             <div class="package-content">
                                 <h4>Web Pack</h4>
-                                <p>A smart web package designed for a clean brand launch and essential digital
-                                    visibility.</p>
+                                <p>A clean static website package for businesses that need a credible, responsive, and
+                                    easy-to-contact online presence.</p>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
 
-            <!-- Visual Content Cretion -->
             <div class="package-group reveal">
                 <div class="package-group-head">
                     <h3>Visual Content Creation</h3>
-                    <span>Creative content package for digital marketing and visual brand impact</span>
+                    <span>Creative poster package for digital marketing and social media visibility</span>
                 </div>
 
-                <div class="row g-4 ">
-
-                    <!-- Poster Pack -->
-                    <div class="col-md-4 col-xl-6">
+                <div class="row g-4 justify-content-center">
+                    <div class="col-md-8 col-lg-6 col-xl-5">
                         <div class="package-card">
                             <div class="package-image-wrap">
-                                <img src="assets/packages/vcontent/poster-pack.png" alt="Poster Pack details"
-                                    class="package-image" width="504" height="399" loading="lazy" decoding="async">
+                                <img src="assets/packages/vcontent/2.png" alt="Poster Pack details"
+                                    class="package-image" width="1254" height="1254" loading="lazy" decoding="async">
                             </div>
                             <div class="package-content">
                                 <h4>Poster Pack</h4>
-                                <p>A creative visual bundle for social media campaigns, branded graphics, and
-                                    high-impact promotional content.</p>
+                                <p>A focused visual content package for branded social posts, ready-size marketing
+                                    creatives, and consistent online communication.</p>
                             </div>
                         </div>
                     </div>
-
-
                 </div>
             </div>
 
-
-            <!-- Combo Pack -->
             <div class="package-group reveal">
                 <div class="package-group-head">
                     <h3>Combo Pack</h3>
-                    <span>Outstanding combo packages intergrting both web and graphics into one outcome</span>
+                    <span>Launch-ready bundles combining website presence with branded visual content</span>
                 </div>
 
-
-                <div class="row g-4">
-
-                    <!-- Starter Web + Poster Pack -->
-                    <div class="col-md-4 col-xl-6">
-                        <div class="package-card">
+                <div class="row g-4 justify-content-center">
+                    <div class="col-md-6 col-xl-5">
+                        <div class="package-card package-card-featured">
                             <div class="package-image-wrap">
-                                <img src="assets/packages/combo/starter-web-poster-pack.png" alt="Starter Web + Poster Pack details"
-                                    class="package-image" width="504" height="399" loading="lazy" decoding="async">
+                                <img src="assets/packages/combo-pack/3.png" alt="Start Web and Poster Pack details"
+                                    class="package-image" width="1254" height="1254" loading="lazy" decoding="async">
                             </div>
                             <div class="package-content">
-                                <h4>Starter Web + Poster Pack</h4>
-                                <p>A creative combination for business who expects both web and graphics.</p>
+                                <h4>Start Web + Poster Pack</h4>
+                                <p>A practical starter combo for launching online with a responsive website and a set
+                                    of branded social media posts.</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Brand Launch Pack -->
-                    <div class="col-md-4 col-xl-6">
-                        <div class="package-card">
+                    <div class="col-md-6 col-xl-5">
+                        <div class="package-card package-card-featured">
                             <div class="package-image-wrap">
-                                <img src="assets/packages/combo/brand-launch-pack.png" alt="Brand Launch Pack details"
-                                    class="package-image" width="504" height="399" loading="lazy" decoding="async">
+                                <img src="assets/packages/combo-pack/4.png" alt="Brand Launch Pack details"
+                                    class="package-image" width="1254" height="1254" loading="lazy" decoding="async">
                             </div>
                             <div class="package-content">
                                 <h4>Brand Launch Pack</h4>
-                                <p>The extraodinary package for a complete brand launch, featuring both website launch and poster/banner designing.</p>
+                                <p>A premium combo for businesses that need a full brand launch with logo design,
+                                    website delivery, social posts, and business card design.</p>
                             </div>
                         </div>
                     </div>
-
                 </div>
-
-               
-
             </div>
-
-
         </div>
     </section>
 
@@ -731,20 +724,21 @@
     </div>
 
     <!-- Contact / CTA -->
-    <section class="py-5" id="contact">
+    <section class="py-5 contact-section" id="contact" aria-labelledby="contact-title">
         <div class="container py-5">
             <div class="cta-box reveal">
-                <h2 class="section-title mb-3">Let’s Build Something Powerful</h2>
+                <span class="section-kicker">Project Inquiry</span>
+                <h2 class="section-title mb-3" id="contact-title">Let’s Build Something Powerful</h2>
                 <p class="section-subtitle mb-4">
-                    Partner with Sentron Tech Solutions to create a bold digital presence through
-                    web development, UI/UX design, and AI-powered creative services.
+                    Tell us what you need. We’ll review your request and contact you with the next practical step for
+                    your website, UI/UX, branding, or AI creative project.
                 </p>
 
                 <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
                     <a href="mailto:sentrontechsolutions@gmail.com" class="btn btn-glow px-4 py-3">
                         <i class="fa-solid fa-envelope me-2"></i> Email Us
                     </a>
-                    <a href="https://wa.me/94725711614" target="_blank" rel="noopener noreferrer"
+                    <a href="https://wa.me/94725711614?text=Hello%20Sentron%20Tech%20Solutions%2C%20I%20would%20like%20to%20discuss%20a%20digital%20project." target="_blank" rel="noopener noreferrer"
                         class="btn btn-outline-tech btn-whatsapp px-4 py-3">
                         <i class="fa-brands fa-whatsapp me-2"></i> Chat on WhatsApp
                     </a>
@@ -754,6 +748,76 @@
                     <a href="https://github.com/sentrontechsolutions" target="_blank" rel="noopener noreferrer" class="btn btn-outline-tech btn-github px-4 py-3">
                         <i class="fa-brands fa-github me-2"></i> View Development Projects
                     </a>
+                </div>
+
+                <div class="row g-4 align-items-stretch mb-5">
+                    <div class="col-lg-5">
+                        <div class="contact-intro-panel h-100">
+                            <span class="mini-label">Fast static integration</span>
+                            <h3>Send a project request directly from the website.</h3>
+                            <p>
+                                This form uses Formspree with a standard HTML POST method, so it works smoothly on
+                                GitHub Pages, Netlify, or any static hosting provider without PHP, database, or backend code.
+                            </p>
+                            <ul class="contact-proof-list">
+                                <li><i class="fa-solid fa-circle-check"></i> Website and UI/UX inquiries</li>
+                                <li><i class="fa-solid fa-circle-check"></i> Branding and AI creative work</li>
+                                <li><i class="fa-solid fa-circle-check"></i> Mobile-friendly contact flow</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-7">
+                        <form class="contact-form" action="https://formspree.io/f/meenkwpn" method="POST">
+                            <input type="hidden" name="_subject" value="New website inquiry from Sentron Tech Solutions">
+                            <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="form-honeypot" aria-hidden="true">
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="contactName" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="contactName" name="name" placeholder="Your name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="contactEmail" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="contactEmail" name="email" placeholder="you@example.com" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="contactPhone" class="form-label">Phone / WhatsApp</label>
+                                    <input type="tel" class="form-control" id="contactPhone" name="phone" placeholder="+94 7X XXX XXXX">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="contactService" class="form-label">Service Needed</label>
+                                    <select class="form-select" id="contactService" name="service" required>
+                                        <option value="" selected disabled>Select a service</option>
+                                        <option>Business Website</option>
+                                        <option>UI/UX Design</option>
+                                        <option>Digital Branding</option>
+                                        <option>AI Visual Content</option>
+                                        <option>Promotional Video / Media</option>
+                                        <option>Other Digital Project</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label for="contactMessage" class="form-label">Project Message</label>
+                                    <textarea class="form-control" id="contactMessage" name="message" rows="5" placeholder="Briefly explain your business, project goal, timeline, and any reference websites." required></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check contact-consent">
+                                        <input class="form-check-input" type="checkbox" value="Agreed" id="contactConsent" name="privacy_consent" required>
+                                        <label class="form-check-label" for="contactConsent">
+                                            I agree to be contacted by Sentron Tech Solutions about this inquiry.
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-12 d-flex flex-wrap align-items-center gap-3">
+                                    <button type="submit" class="btn btn-glow px-5 py-3">
+                                        Send Inquiry <i class="fa-solid fa-paper-plane ms-2"></i>
+                                    </button>
+                                    <small class="form-helper-text">Powered by Formspree</small>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
                 <div class="row g-4 text-start">
@@ -805,8 +869,8 @@
                     <h5 class="mb-3">Sentron Tech Solutions</h5>
                     <p class="mb-2">Website Design | UI/UX Design | AI Creative Services</p>
                     <p class="footer-founder small mb-2">Founder: Sanija Weerasuriya</p>
-                    <p class="mb-1"><i class="fa-solid fa-map-marker-alt me-2"></i>Service Area: Gonawala, Gampaha District, Sri Lanka</p>
-                    <p class="text-secondary">Serving clients across Sri Lanka</p>
+                    <p class="mb-1"><i class="fa-solid fa-map-marker-alt me-2"></i>Gonawala, Gampaha District, Sri Lanka</p>
+                    <p class="text-secondary">Serving clients across the globe</p>
                 </div>
                 <div class="col-lg-6 footer-contact-col">
                     <div class="contact-info footer-contact-block">
@@ -826,14 +890,14 @@
                             <a href="https://wa.me/94725711614" target="_blank" rel="noopener noreferrer" class="me-3"
                                 aria-label="Chat with Sentron Tech Solutions on WhatsApp"><i
                                     class="fa-brands fa-whatsapp"></i></a>
-                            <a href="mailto:sentrontechsolutions@gmail.com" class="me-3"
+                            <a href="mailto:info@sentrontech.online" class="me-3"
                                 aria-label="Email Sentron Tech Solutions"><i class="fa-solid fa-envelope"></i></a>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p class="footer-copy text-secondary small mb-0">&copy; 2026 Sentron Tech Solutions. All Rights Reserved.</p>
+                <p class="footer-copy text-secondary small mb-0">&copy; <span data-current-year>2026</span> Sentron Tech Solutions. All Rights Reserved.</p>
                 <div class="footer-legal-links">
                     <a href="privacy-policy.html">Privacy Policy</a>
                     <a href="terms-and-conditions.html">Terms &amp; Conditions</a>
@@ -845,25 +909,11 @@
     <div class="corner-floating-logo" aria-hidden="true">
         <img src="assets/logo.png" alt="" width="500" height="500" loading="lazy" decoding="async">
     </div>
-
-    <audio id="backgroundAudio" loop preload="metadata">
-        <source src="resources/internal/bg_audio.mp3" type="audio/mpeg">
-    </audio>
-
-    <button class="music-toggle" type="button" data-music-toggle aria-label="Play background music" title="Play background music">
-        <span class="music-beat-waves" aria-hidden="true">
-            <span></span>
-            <span></span>
-            <span></span>
-        </span>
-        <i class="fa-solid fa-music" aria-hidden="true"></i>
-    </button>
-
-    <!-- Bootstrap JS -->
+<!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Custom JS -->
-    <script src="script.js"></script>
+    <script src="assets/js/main.js"></script>
 </body>
 
 </html>

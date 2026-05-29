@@ -1,53 +1,85 @@
 # Sentron Tech Solutions - Business Website
 
-This repository contains the official business website for **Sentron Tech Solutions**, a modern digital solutions company focused on helping businesses build a strong and professional online presence.
+Official static business website for **Sentron Tech Solutions**, a Sri Lanka based digital solutions company offering web design, UI/UX design, digital branding, AI-powered visual content, and short promotional media services.
 
-Sentron Tech Solutions provides services such as web development, web application development, UI/UX design, digital branding, poster design, AI-powered visual content creation, and short promotional video generation.
+## Project Status
 
-The website is designed as a responsive, modern, and user-friendly platform to showcase the company’s services, portfolio, brand identity, and contact information.
+This version includes an enterprise UI refresh with a dark editorial visual direction, a glassmorphism welcome card, a typewriter hero message, optimized image assets, and a working Formspree customer contact form.
 
-## Services Highlighted
+## Main Features
 
-- Web Development
-- Web Application Development
-- UI/UX Design
-- Digital Branding
-- Poster and Advertisement Design
-- AI Visual Content Creation
-- Short Promotional Video Generation
-- Business Website Solutions
-
-## Purpose of This Website
-
-The purpose of this website is to present Sentron Tech Solutions professionally to clients, showcase available digital services, and make it easy for businesses to contact us for web and creative digital solutions.
+- Responsive single-page business website
+- Glassmorphism welcome card in the hero section
+- Typewriter + gradient hero headline
+- Core services section
+- Portfolio/demo project showcase
+- Website and visual content package cards
+- Why choose Sentron section
+- Customer inquiry form powered by Formspree
+- Privacy Policy and Terms & Conditions pages
+- SEO essentials: canonical URL, Open Graph metadata, sitemap, robots.txt, and structured data
 
 ## Technologies Used
 
-- HTML
-- CSS
+- HTML5
+- CSS3
 - JavaScript
-- Bootstrap
-- GitHub Pages
+- Bootstrap 5
+- Font Awesome
+- Formspree
+- GitHub Pages compatible static hosting
 
-## About Sentron Tech Solutions
+## Recommended File Structure
 
-**Sentron Tech Solutions** is founded and developed by **Sanija Weerasuriya**, with the goal of delivering modern, creative, and reliable digital solutions for businesses and individuals.
+```text
+/
+├── index.html
+├── privacy-policy.html
+├── terms-and-conditions.html
+├── CNAME
+├── robots.txt
+├── sitemap.xml
+├── LICENSE
+├── README.md
+├── assets/
+│   ├── css/styles.css
+│   ├── js/main.js
+│   ├── logo.png
+│   ├── og-image.png
+│   ├── demoProjects/
+│   └── packages/
+```
 
+## Contact Form
+
+The customer inquiry form posts to Formspree:
+
+```text
+https://formspree.io/f/meenkwpn
+```
+
+This project uses the **Basic HTML** Formspree integration because the website is static and does not require React, PHP, a database, or a build system.
+
+## Deployment Notes
+
+1. Upload/commit the full project to the GitHub repository root.
+2. Keep `index.html`, `CNAME`, `robots.txt`, and `sitemap.xml` in the root.
+3. In GitHub Pages, publish from the main branch root unless you use a docs folder setup.
+4. Keep the custom domain in `CNAME` as `www.sentrontech.online`.
+5. After deployment, test:
+   - Home page sections
+   - Contact form submission
+   - Privacy Policy and Terms links
+   - Mobile navigation
+   - Open Graph image preview
+
+## Ownership
+
+This project is maintained by **Sentron Tech Solutions**.
+
+Founder & Developer: **Sanija Weerasuriya**  
+GitHub: https://github.com/sanijaweerasuriya
 
 ## License
 
-This project is maintained by Sentron Tech Solutions.  
-All rights reserved.
-
-
-<p class="footer-credit"> <i>
-  Developed by <strong>Sentron Tech Solutions</strong> |
-  Founder & Developer:
-    Sanija Weerasuriya ->>>
-  </a>
-   <a class="github-link" href="https://github.com/sanijaweerasuriya" target="_blank" rel="noopener noreferrer">
-    View GitHub
-  </a>
-</i>
-</p>
-
+All rights reserved unless a separate written agreement states otherwise.
