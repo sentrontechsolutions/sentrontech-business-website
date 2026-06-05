@@ -1,35 +1,104 @@
-// Navbar shadow on scroll
+// Navbar shadow and dynamic background parallax on scroll
 const navbar = document.querySelector(".navbar");
+const heroGradientField = document.querySelector(".hero-gradient-field");
+const digitalDotsBg = document.querySelector(".digital-dots-bg");
+
+let scrollTicking = false;
+let backgroundOffset = 0;
+
+function updateScrollEffects() {
+  const scrollY = window.scrollY;
+
+  if (navbar) {
+    navbar.classList.toggle("scrolled", scrollY > 30);
+  }
+
+  const targetOffset = Math.min(85, scrollY * 0.18);
+  backgroundOffset += (targetOffset - backgroundOffset) * 0.16;
+
+  if (heroGradientField) {
+    heroGradientField.style.transform = `translate3d(0, ${backgroundOffset * 0.48}px, 0)`;
+  }
+
+  if (digitalDotsBg) {
+    digitalDotsBg.style.transform = `translate3d(0, ${backgroundOffset * 0.26}px, 0)`;
+  }
+
+  scrollTicking = false;
+}
 
 window.addEventListener("scroll", () => {
-  if (!navbar) return;
+  if (!scrollTicking) {
+    window.requestAnimationFrame(updateScrollEffects);
+    scrollTicking = true;
+  }
+}, { passive: true });
 
-  if (window.scrollY > 30) {
-    navbar.classList.add("scrolled");
-  } else {
-    navbar.classList.remove("scrolled");
+window.addEventListener("load", updateScrollEffects);
+
+const cursorDestination = document.createElement("div");
+cursorDestination.className = "cursor-destination";
+document.body.appendChild(cursorDestination);
+
+let cursorTargetX = window.innerWidth / 2;
+let cursorTargetY = window.innerHeight / 2;
+let cursorShadowX = cursorTargetX;
+let cursorShadowY = cursorTargetY;
+let isPointerActive = false;
+
+function animateCursorShadow() {
+  cursorShadowX = cursorTargetX - 28;
+  cursorShadowY = cursorTargetY - 24;
+  cursorDestination.style.transform = `translate3d(${cursorShadowX}px, ${cursorShadowY}px, 0)`;
+  window.requestAnimationFrame(animateCursorShadow);
+}
+
+window.addEventListener("pointermove", (event) => {
+  cursorTargetX = event.clientX;
+  cursorTargetY = event.clientY;
+  if (!isPointerActive) {
+    isPointerActive = true;
+    cursorDestination.style.opacity = "1";
   }
 });
+
+window.addEventListener("pointerleave", () => {
+  isPointerActive = false;
+  cursorDestination.style.opacity = "0";
+});
+
+window.requestAnimationFrame(animateCursorShadow);
 
 // Scroll reveal animation
 const revealElements = document.querySelectorAll(".reveal, .reveal-left, .reveal-right");
 
-function revealOnScroll() {
-  const triggerBottom = window.innerHeight * 0.88;
+if ("IntersectionObserver" in window && revealElements.length) {
+  const revealObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("active");
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.12 });
 
-  revealElements.forEach((el) => {
-    const top = el.getBoundingClientRect().top;
-    if (top < triggerBottom) {
-      el.classList.add("active");
-    }
-  });
+  revealElements.forEach((el) => revealObserver.observe(el));
+} else {
+  function revealOnScroll() {
+    const triggerBottom = window.innerHeight * 0.88;
+
+    revealElements.forEach((el) => {
+      const top = el.getBoundingClientRect().top;
+      if (top < triggerBottom) {
+        el.classList.add("active");
+      }
+    });
+  }
+
+  window.addEventListener("scroll", revealOnScroll, { passive: true });
+  window.addEventListener("load", revealOnScroll);
 }
 
-window.addEventListener("scroll", revealOnScroll);
-window.addEventListener("load", revealOnScroll);
-
 // Digital dots background motion
-const digitalDotsBg = document.querySelector(".digital-dots-bg");
 const dotsReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 if (digitalDotsBg) {
