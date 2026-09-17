@@ -1,359 +1,524 @@
-// Navbar shadow and dynamic background parallax on scroll
-const navbar = document.querySelector(".navbar");
-const heroGradientField = document.querySelector(".hero-gradient-field");
-const digitalDotsBg = document.querySelector(".digital-dots-bg");
+/**
+ * SENTRON TECH SOLUTIONS — INTERACTIVE CORE & REGIONAL PACKAGE SWITCHER
+ * Minimalist, ultra-smooth static architecture (Zero-PHP, zero external geo APIs)
+ */
 
-let scrollTicking = false;
-let backgroundOffset = 0;
-
-function updateScrollEffects() {
-  const scrollY = window.scrollY;
-
-  if (navbar) {
-    navbar.classList.toggle("scrolled", scrollY > 30);
-  }
-
-  const targetOffset = Math.min(85, scrollY * 0.18);
-  backgroundOffset += (targetOffset - backgroundOffset) * 0.16;
-
-  if (heroGradientField) {
-    heroGradientField.style.transform = `translate3d(0, ${backgroundOffset * 0.48}px, 0)`;
-  }
-
-  if (digitalDotsBg) {
-    digitalDotsBg.style.transform = `translate3d(0, ${backgroundOffset * 0.26}px, 0)`;
-  }
-
-  scrollTicking = false;
-}
-
-window.addEventListener("scroll", () => {
-  if (!scrollTicking) {
-    window.requestAnimationFrame(updateScrollEffects);
-    scrollTicking = true;
-  }
-}, { passive: true });
-
-window.addEventListener("load", updateScrollEffects);
-
-const cursorDestination = document.createElement("div");
-cursorDestination.className = "cursor-destination";
-document.body.appendChild(cursorDestination);
-
-let cursorTargetX = window.innerWidth / 2;
-let cursorTargetY = window.innerHeight / 2;
-let cursorShadowX = cursorTargetX;
-let cursorShadowY = cursorTargetY;
-let isPointerActive = false;
-
-function animateCursorShadow() {
-  cursorShadowX = cursorTargetX - 28;
-  cursorShadowY = cursorTargetY - 24;
-  cursorDestination.style.transform = `translate3d(${cursorShadowX}px, ${cursorShadowY}px, 0)`;
-  window.requestAnimationFrame(animateCursorShadow);
-}
-
-window.addEventListener("pointermove", (event) => {
-  cursorTargetX = event.clientX;
-  cursorTargetY = event.clientY;
-  if (!isPointerActive) {
-    isPointerActive = true;
-    cursorDestination.style.opacity = "1";
-  }
-});
-
-window.addEventListener("pointerleave", () => {
-  isPointerActive = false;
-  cursorDestination.style.opacity = "0";
-});
-
-window.requestAnimationFrame(animateCursorShadow);
-
-// Scroll reveal animation
-const revealElements = document.querySelectorAll(".reveal, .reveal-left, .reveal-right");
-
-if ("IntersectionObserver" in window && revealElements.length) {
-  const revealObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add("active");
-      observer.unobserve(entry.target);
-    });
-  }, { threshold: 0.12 });
-
-  revealElements.forEach((el) => revealObserver.observe(el));
-} else {
-  function revealOnScroll() {
-    const triggerBottom = window.innerHeight * 0.88;
-
-    revealElements.forEach((el) => {
-      const top = el.getBoundingClientRect().top;
-      if (top < triggerBottom) {
-        el.classList.add("active");
-      }
-    });
-  }
-
-  window.addEventListener("scroll", revealOnScroll, { passive: true });
-  window.addEventListener("load", revealOnScroll);
-}
-
-// Digital dots background motion
-const dotsReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-
-if (digitalDotsBg) {
-  const dotPointer = {
-    x: -9999,
-    y: -9999,
-    active: false
+document.addEventListener('DOMContentLoaded', () => {
+  /* --------------------------------------------------------------------------
+   * 1. REGION & PACKAGE SHOWCASE MANAGER
+   * -------------------------------------------------------------------------- */
+  const REGION_DATA = {
+    sri_lanka: {
+      id: 'sri_lanka',
+      label: 'Sri Lanka — LKR',
+      shortLabel: 'Sri Lanka',
+      flag: '🇱🇰',
+      currency: 'LKR',
+      folder: 'assets/packages/sri_lanka'
+    },
+    asia: {
+      id: 'asia',
+      label: 'Asia — USD',
+      shortLabel: 'Asia',
+      flag: '🌏',
+      currency: 'USD',
+      folder: 'assets/packages/asia_africa'
+    },
+    europe: {
+      id: 'europe',
+      label: 'Europe — EUR',
+      shortLabel: 'Europe',
+      flag: '🇪🇺',
+      currency: 'EUR',
+      folder: 'assets/packages/europe'
+    },
+    america: {
+      id: 'america',
+      label: 'North & South America — USD',
+      shortLabel: 'America',
+      flag: '🌎',
+      currency: 'USD',
+      folder: 'assets/packages/america'
+    },
+    africa: {
+      id: 'africa',
+      label: 'Africa — USD',
+      shortLabel: 'Africa',
+      flag: '🌍',
+      currency: 'USD',
+      folder: 'assets/packages/asia_africa'
+    },
+    australia: {
+      id: 'australia',
+      label: 'Australia — AUD',
+      shortLabel: 'Australia',
+      flag: '🇦🇺',
+      currency: 'AUD',
+      folder: 'assets/packages/australia'
+    }
   };
 
-  let dotStates = [];
-  let lastDotScrollY = window.scrollY;
-  let dotScrollDrift = 0;
-  let targetDotScrollDrift = 0;
-  let dotResizeTimer = null;
+  const STORAGE_KEY = 'sentron_selected_region';
+  const DEFAULT_REGION = 'sri_lanka';
 
-  function shouldShowDots() {
-    return window.innerWidth >= 768;
+  // Elements
+  const regionSelectWrap = document.getElementById('navbarRegionSelector');
+  const regionTriggerBtn = document.getElementById('navbarRegionTrigger');
+  const regionDropdownMenu = document.getElementById('navbarRegionDropdown');
+  const navTriggerFlag = document.getElementById('navTriggerFlag');
+  const navTriggerText = document.getElementById('navTriggerText');
+
+  const inPagePills = document.querySelectorAll('.region-pill');
+  const activeRegionBannerText = document.getElementById('currentRegionLabel');
+  const packageImages = document.querySelectorAll('.package-dynamic-img');
+  const packageCards = document.querySelectorAll('.package-card');
+  const packageInquireBtns = document.querySelectorAll('.btn-package-inquire');
+
+  // Contact form elements
+  const contactServiceSelect = document.getElementById('contactService');
+  const contactMessageInput = document.getElementById('contactMessage');
+
+  let currentRegion = DEFAULT_REGION;
+
+  // Retrieve saved preference or use default
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved && REGION_DATA[saved]) {
+      currentRegion = saved;
+    }
+  } catch (e) {
+    // localStorage might be unavailable in private browsing
   }
 
-  function buildDigitalDots() {
-    digitalDotsBg.innerHTML = "";
-    dotStates = [];
-
-    if (!shouldShowDots()) return;
-
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    const count = Math.min(190, Math.max(90, Math.round((width * height) / 9800)));
-    const columns = Math.ceil(Math.sqrt(count * (width / height)));
-    const rows = Math.ceil(count / columns);
-    const cellWidth = width / columns;
-    const cellHeight = height / rows;
-
-    for (let index = 0; index < count; index += 1) {
-      const column = index % columns;
-      const row = Math.floor(index / columns);
-      const x = (column + 0.18 + Math.random() * 0.64) * cellWidth;
-      const y = (row + 0.18 + Math.random() * 0.64) * cellHeight;
-      const sizeRoll = Math.random();
-      let size = 2.4 + Math.random() * 1.4;
-
-      if (sizeRoll > 0.55) {
-        size = 4 + Math.random() * 1.8;
-      }
-
-      if (sizeRoll > 0.82) {
-        size = 6.2 + Math.random() * 2.2;
-      }
-
-      if (sizeRoll > 0.95) {
-        size = 9 + Math.random() * 2.8;
-      }
-      const dot = document.createElement("span");
-
-      dot.className = "digital-dot";
-      dot.style.left = `${x.toFixed(2)}px`;
-      dot.style.top = `${y.toFixed(2)}px`;
-      dot.style.setProperty("--dot-size", `${size.toFixed(2)}px`);
-      dot.style.setProperty("--dot-alpha", (0.2 + Math.random() * 0.2).toFixed(2));
-      dot.style.setProperty("--dot-pulse-duration", `${(3.6 + Math.random() * 3.8).toFixed(2)}s`);
-      dot.style.animationDelay = `${(-Math.random() * 6).toFixed(2)}s`;
-      digitalDotsBg.appendChild(dot);
-
-      dotStates.push({
-        dot,
-        baseX: x,
-        baseY: y,
-        phase: Math.random() * Math.PI * 2,
-        depth: 0.55 + Math.random() * 0.65,
-        repelX: 0,
-        repelY: 0
-      });
-    }
-  }
-
-  function animateDigitalDots(time) {
-    if (!shouldShowDots()) {
-      if (dotStates.length) buildDigitalDots();
-      window.requestAnimationFrame(animateDigitalDots);
-      return;
-    }
-
-    if (!dotStates.length) buildDigitalDots();
-
-    targetDotScrollDrift *= 0.88;
-    dotScrollDrift += (targetDotScrollDrift - dotScrollDrift) * 0.22;
-
-    dotStates.forEach((state) => {
-      const idleX = Math.sin(time * 0.00058 + state.phase) * (2.8 + state.depth * 3.6);
-      const idleY = Math.cos(time * 0.00052 + state.phase) * (3.2 + state.depth * 4.2);
-      const driftY = dotScrollDrift * state.depth;
-      const centerX = state.baseX + idleX;
-      const centerY = state.baseY + idleY + driftY;
-      const deltaX = centerX - dotPointer.x;
-      const deltaY = centerY - dotPointer.y;
-      const distance = Math.hypot(deltaX, deltaY) || 1;
-      const repelRadius = 92;
-      const repelPower = dotPointer.active && distance < repelRadius
-        ? Math.pow(1 - distance / repelRadius, 2)
-        : 0;
-      const push = 62 * repelPower;
-      const targetRepelX = (deltaX / distance) * push;
-      const targetRepelY = (deltaY / distance) * push;
-
-      state.repelX += (targetRepelX - state.repelX) * 0.32;
-      state.repelY += (targetRepelY - state.repelY) * 0.32;
-
-      if (dotsReducedMotion.matches) {
-        state.dot.style.transform = "translate3d(0, 0, 0)";
-        return;
-      }
-
-      const moveX = idleX + state.repelX;
-      const moveY = idleY + driftY + state.repelY;
-
-      state.dot.style.transform = `translate3d(${moveX.toFixed(2)}px, ${moveY.toFixed(2)}px, 0)`;
-    });
-
-    window.requestAnimationFrame(animateDigitalDots);
-  }
-
-  buildDigitalDots();
-
-  window.addEventListener("resize", () => {
-    window.clearTimeout(dotResizeTimer);
-    dotResizeTimer = window.setTimeout(buildDigitalDots, 120);
-  });
-  window.addEventListener("pointermove", (event) => {
-    dotPointer.x = event.clientX;
-    dotPointer.y = event.clientY;
-    dotPointer.active = true;
-  }, { passive: true });
-  window.addEventListener("pointerleave", () => {
-    dotPointer.active = false;
-  });
-  document.addEventListener("mouseleave", () => {
-    dotPointer.active = false;
-  });
-  window.addEventListener("scroll", () => {
-    const delta = window.scrollY - lastDotScrollY;
-    const direction = Math.sign(delta);
-    const distance = Math.abs(delta);
-
-    if (direction !== 0) {
-      targetDotScrollDrift = Math.max(-24, Math.min(24, direction * Math.min(24, distance * 0.28)));
-    }
-
-    lastDotScrollY = window.scrollY;
-  }, { passive: true });
-
-  window.requestAnimationFrame(animateDigitalDots);
-}
-
-// Copy to clipboard functionality
-document.querySelectorAll(".copy-btn").forEach((btn) => {
-  btn.addEventListener("click", async () => {
-    const text = btn.getAttribute("data-copy");
-    try {
-      await navigator.clipboard.writeText(text);
-      const icon = btn.querySelector("i");
-      icon.className = "fa-solid fa-check";
-      setTimeout(() => {
-        icon.className = "fa-solid fa-copy";
-      }, 2000);
-    } catch (err) {
-      console.error("Failed to copy: ", err);
-    }
-  });
-});
-
-
-// Enterprise additions: typewriter hero, mobile nav closing, active nav state, dynamic year.
-(() => {
-  const yearTargets = document.querySelectorAll('[data-current-year]');
-  yearTargets.forEach((target) => {
-    target.textContent = new Date().getFullYear();
-  });
-
-  const typewriter = document.querySelector('[data-typewriter]');
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (typewriter && !prefersReducedMotion) {
-    let phrases = [];
-    try {
-      phrases = JSON.parse(typewriter.getAttribute('data-typewriter-phrases') || '[]');
-    } catch (error) {
-      phrases = [];
-    }
-
-    if (phrases.length) {
-      let phraseIndex = 0;
-      let letterIndex = 0;
-      let deleting = false;
-      const typeSpeed = 55;
-      const deleteSpeed = 32;
-      const pauseTime = 1400;
-
-      const typeLoop = () => {
-        const phrase = phrases[phraseIndex];
-        typewriter.textContent = phrase.slice(0, letterIndex);
-
-        if (!deleting && letterIndex < phrase.length) {
-          letterIndex += 1;
-          window.setTimeout(typeLoop, typeSpeed);
-          return;
-        }
-
-        if (!deleting && letterIndex === phrase.length) {
-          deleting = true;
-          window.setTimeout(typeLoop, pauseTime);
-          return;
-        }
-
-        if (deleting && letterIndex > 0) {
-          letterIndex -= 1;
-          window.setTimeout(typeLoop, deleteSpeed);
-          return;
-        }
-
-        deleting = false;
-        phraseIndex = (phraseIndex + 1) % phrases.length;
-        window.setTimeout(typeLoop, 260);
-      };
-
-      typeLoop();
-    }
-  }
-
-  const navCollapse = document.querySelector('.navbar-collapse');
-  const navLinks = document.querySelectorAll('.navbar-nav .nav-link, .navbar-nav .btn');
-
-  navLinks.forEach((link) => {
-    link.addEventListener('click', () => {
-      if (!navCollapse || !navCollapse.classList.contains('show') || typeof bootstrap === 'undefined') return;
-      const collapse = bootstrap.Collapse.getOrCreateInstance(navCollapse);
-      collapse.hide();
-    });
-  });
-
-  const sectionLinks = [...document.querySelectorAll('.navbar-nav .nav-link[href^="#"]')];
-  const sections = sectionLinks
-    .map((link) => document.querySelector(link.getAttribute('href')))
-    .filter(Boolean);
-
-  if ('IntersectionObserver' in window && sections.length) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const id = `#${entry.target.id}`;
-        sectionLinks.forEach((link) => {
-          link.classList.toggle('active', link.getAttribute('href') === id);
+  /**
+   * Preload an array of image URLs
+   */
+  function preloadImages(urls) {
+    return Promise.all(
+      urls.map((url) => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(url);
+          img.onerror = () => resolve(url); // fallback so promise resolves
+          img.src = url;
         });
-      });
-    }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
-
-    sections.forEach((section) => observer.observe(section));
+      })
+    );
   }
-})();
+
+  /**
+   * Switch the current region with ultra-smooth image transitions
+   */
+  async function selectRegion(regionId, animate = true) {
+    const target = REGION_DATA[regionId] || REGION_DATA[DEFAULT_REGION];
+    currentRegion = target.id;
+
+    // 1. Update Navbar Trigger Button UI
+    if (navTriggerFlag && navTriggerText) {
+      navTriggerFlag.textContent = target.flag;
+      navTriggerText.textContent = `${target.shortLabel} (${target.currency})`;
+    }
+
+    // 2. Update Navbar Dropdown Option Items
+    if (regionDropdownMenu) {
+      const options = regionDropdownMenu.querySelectorAll('.region-option-item');
+      options.forEach((opt) => {
+        const isMatch = opt.getAttribute('data-region') === target.id;
+        opt.classList.toggle('selected', isMatch);
+        opt.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+      });
+    }
+
+    // 3. Update In-Page Pills in Packages Section
+    if (inPagePills.length > 0) {
+      inPagePills.forEach((pill) => {
+        const isMatch = pill.getAttribute('data-region') === target.id;
+        pill.classList.toggle('active', isMatch);
+        pill.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+      });
+    }
+
+    // 4. Update In-Page Current Region Banner
+    if (activeRegionBannerText) {
+      activeRegionBannerText.innerHTML = `${target.flag} Currently showing packages for <strong>${target.label}</strong>`;
+    }
+
+    // 5. Preload all 4 package images concurrently before swapping
+    const targetImages = [
+      `${target.folder}/1.png`,
+      `${target.folder}/2.png`,
+      `${target.folder}/3.png`,
+      `${target.folder}/4.png`
+    ];
+
+    if (animate) {
+      packageCards.forEach(c => c.classList.add('loading'));
+      packageImages.forEach(img => img.classList.add('is-swapping'));
+    }
+
+    // Preload all 4 in parallel
+    await preloadImages(targetImages);
+
+    // Apply the newly preloaded images smoothly
+    packageImages.forEach((img) => {
+      const packageIndex = img.getAttribute('data-package-index'); // 1, 2, 3, 4
+      const targetSrc = `${target.folder}/${packageIndex}.png`;
+      img.src = targetSrc;
+    });
+
+    if (animate) {
+      // Short delay for visual polish and transition removal
+      setTimeout(() => {
+        packageImages.forEach(img => img.classList.remove('is-swapping'));
+        packageCards.forEach(c => c.classList.remove('loading'));
+      }, 120);
+    } else {
+      packageImages.forEach(img => img.classList.remove('is-swapping'));
+      packageCards.forEach(c => c.classList.remove('loading'));
+    }
+
+    // 6. Save preference to storage
+    try {
+      localStorage.setItem(STORAGE_KEY, target.id);
+    } catch (e) {
+      // Ignore storage errors
+    }
+  }
+
+  // Handle Navbar Trigger Toggle
+  if (regionTriggerBtn && regionSelectWrap) {
+    regionTriggerBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = regionSelectWrap.classList.contains('active');
+      regionSelectWrap.classList.toggle('active', !isOpen);
+      regionTriggerBtn.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
+    });
+
+    // Close when clicking anywhere outside
+    document.addEventListener('click', (e) => {
+      if (!regionSelectWrap.contains(e.target)) {
+        regionSelectWrap.classList.remove('active');
+        regionTriggerBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && regionSelectWrap.classList.contains('active')) {
+        regionSelectWrap.classList.remove('active');
+        regionTriggerBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  // Handle Option Click inside Navbar Dropdown
+  if (regionDropdownMenu) {
+    const options = regionDropdownMenu.querySelectorAll('.region-option-item');
+    options.forEach((opt) => {
+      opt.addEventListener('click', () => {
+        const regionId = opt.getAttribute('data-region');
+        selectRegion(regionId, true);
+        if (regionSelectWrap) {
+          regionSelectWrap.classList.remove('active');
+          if (regionTriggerBtn) {
+            regionTriggerBtn.setAttribute('aria-expanded', 'false');
+          }
+        }
+      });
+    });
+  }
+
+  // Handle In-Page Pill Buttons
+  inPagePills.forEach((pill) => {
+    pill.addEventListener('click', () => {
+      const regionId = pill.getAttribute('data-region');
+      selectRegion(regionId, true);
+    });
+  });
+
+  // Handle Package Inquire Buttons (Auto-select & prefill contact)
+  packageInquireBtns.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const packageName = btn.getAttribute('data-package-name');
+      const targetRegion = REGION_DATA[currentRegion];
+
+      if (contactServiceSelect) {
+        if (packageName.includes('Web')) {
+          contactServiceSelect.value = 'Business Website';
+        } else if (packageName.includes('Visual') || packageName.includes('Poster')) {
+          contactServiceSelect.value = 'Visual Content';
+        } else if (packageName.includes('Combo')) {
+          contactServiceSelect.value = 'Full Brand Launch';
+        }
+      }
+
+      if (contactMessageInput) {
+        contactMessageInput.value = `Hello Sentron Tech Solutions,\nI am inquiring about the "${packageName}" for the ${targetRegion.label} region. Please contact me with delivery details and onboarding.`;
+      }
+    });
+  });
+
+  // Initialize display without flash
+  selectRegion(currentRegion, false);
+
+  /* --------------------------------------------------------------------------
+   * 2. HEADER SCROLL & MOBILE NAVIGATION
+   * -------------------------------------------------------------------------- */
+  const siteHeader = document.querySelector('.site-header');
+  const menuToggle = document.querySelector('.menu-toggle');
+  const navWrapper = document.querySelector('.nav-wrapper');
+  const navLinks = document.querySelectorAll('.main-nav a');
+
+  function handleHeaderScroll() {
+    if (!siteHeader) return;
+    if (window.scrollY > 40) {
+      siteHeader.classList.add('scrolled');
+    } else {
+      siteHeader.classList.remove('scrolled');
+    }
+  }
+
+  window.addEventListener('scroll', handleHeaderScroll, { passive: true });
+  handleHeaderScroll();
+
+  if (menuToggle && navWrapper) {
+    menuToggle.addEventListener('click', () => {
+      const isOpen = navWrapper.classList.contains('open');
+      navWrapper.classList.toggle('open', !isOpen);
+      menuToggle.classList.toggle('open', !isOpen);
+      menuToggle.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
+    });
+
+    // Handle smooth and precise navigation for all anchor links
+    document.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        const targetHref = link.getAttribute('href');
+        if (!targetHref || targetHref === '#') return;
+
+        const targetEl = document.querySelector(targetHref);
+        if (targetEl) {
+          e.preventDefault();
+
+          // Close mobile menu if open
+          if (navWrapper && navWrapper.classList.contains('open')) {
+            navWrapper.classList.remove('open');
+            if (menuToggle) {
+              menuToggle.classList.remove('open');
+              menuToggle.setAttribute('aria-expanded', 'false');
+            }
+          }
+
+          // Calculate exact header height and scroll target with breathing room
+          const headerHeight = siteHeader ? siteHeader.offsetHeight : 76;
+          const elementTop = targetEl.getBoundingClientRect().top + window.pageYOffset;
+          const destination = elementTop - headerHeight - 16;
+
+          window.scrollTo({
+            top: destination,
+            behavior: 'smooth'
+          });
+
+          // Highlight active link
+          navLinks.forEach((nl) => {
+            nl.classList.toggle('active', nl.getAttribute('href') === targetHref);
+          });
+
+          // Update URL without harsh jump
+          if (history.pushState) {
+            history.pushState(null, null, targetHref);
+          }
+        }
+      });
+    });
+  }
+
+  /* --------------------------------------------------------------------------
+   * 3. SCROLL REVEAL ANIMATIONS
+   * -------------------------------------------------------------------------- */
+  const revealElements = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, {
+      rootMargin: '0px 0px -50px 0px',
+      threshold: 0.1
+    });
+
+    revealElements.forEach((el) => revealObserver.observe(el));
+  } else {
+    // Fallback: make all visible immediately
+    revealElements.forEach((el) => el.classList.add('active'));
+  }
+
+  /* --------------------------------------------------------------------------
+   * 4. FOOTER CURRENT YEAR
+   * -------------------------------------------------------------------------- */
+  const yearEls = document.querySelectorAll('[data-current-year]');
+  const currentYear = new Date().getFullYear();
+  yearEls.forEach((el) => {
+    el.textContent = currentYear;
+  });
+
+  /* --------------------------------------------------------------------------
+   * 5. DYNAMIC SCROLL-REACTIVE LIGHT BLUISH MESH STRUCTURES
+   * -------------------------------------------------------------------------- */
+  const canvas = document.getElementById('bg-canvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    let targetScrollY = window.scrollY || 0;
+    let smoothedScrollY = targetScrollY;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }, { passive: true });
+
+    window.addEventListener('scroll', () => {
+      targetScrollY = window.scrollY || 0;
+    }, { passive: true });
+
+    // Dynamic Undulating Mesh Grid Parameters
+    const cols = 18;
+    const rows = 12;
+    let time = 0;
+    let animId;
+
+    function renderDynamicMesh() {
+      time += 0.016;
+      // Smooth lerp scroll for silky inertia on the mesh structures
+      smoothedScrollY += (targetScrollY - smoothedScrollY) * 0.08;
+      const scrollVelocity = targetScrollY - smoothedScrollY;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Compute mesh node matrix
+      const points = [];
+      const cellWidth = (width + 200) / cols;
+      const cellHeight = (height + 200) / rows;
+      const startX = -100;
+      const startY = -100;
+
+      for (let r = 0; r <= rows; r++) {
+        points[r] = [];
+        for (let c = 0; c <= cols; c++) {
+          const baseX = startX + c * cellWidth;
+          const baseY = startY + r * cellHeight;
+
+          // Wave equation driven by time and scroll
+          const wave1 = Math.sin(time * 0.8 + c * 0.38 + r * 0.3);
+          const wave2 = Math.cos(time * 0.6 - c * 0.25 + r * 0.45);
+          const scrollDisplacement = Math.sin(smoothedScrollY * 0.003 + c * 0.35 + r * 0.2) * 28;
+          const velocityPush = Math.sin(c * 0.5) * (scrollVelocity * 0.15);
+
+          const offsetX = wave2 * 14 + (scrollVelocity * 0.05);
+          const offsetY = (wave1 * 18) + scrollDisplacement + velocityPush;
+
+          points[r][c] = {
+            x: baseX + offsetX,
+            y: baseY + offsetY,
+            depth: (wave1 + wave2 + 2) / 4
+          };
+        }
+      }
+
+      // 1. Draw Mesh Connecting Lines (Light Bluish Cyber Matrix)
+      ctx.lineWidth = 0.75;
+
+      for (let r = 0; r <= rows; r++) {
+        for (let c = 0; c <= cols; c++) {
+          const p = points[r][c];
+
+          // Horizontal wireframe lines
+          if (c < cols) {
+            const nextP = points[r][c + 1];
+            const avgDepth = (p.depth + nextP.depth) / 2;
+            const alpha = 0.04 + avgDepth * 0.08 + Math.min(Math.abs(scrollVelocity) * 0.003, 0.08);
+
+            ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(nextP.x, nextP.y);
+            ctx.stroke();
+          }
+
+          // Vertical wireframe lines
+          if (r < rows) {
+            const nextP = points[r + 1][c];
+            const avgDepth = (p.depth + nextP.depth) / 2;
+            const alpha = 0.035 + avgDepth * 0.07 + Math.min(Math.abs(scrollVelocity) * 0.003, 0.07);
+
+            ctx.strokeStyle = `rgba(96, 165, 250, ${alpha})`;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(nextP.x, nextP.y);
+            ctx.stroke();
+          }
+
+          // Diagonal structural cross-ties (for organic tech mesh look)
+          if (c < cols && r < rows && (r + c) % 2 === 0) {
+            const diagP = points[r + 1][c + 1];
+            const avgDepth = (p.depth + diagP.depth) / 2;
+            const alpha = 0.02 + avgDepth * 0.05;
+
+            ctx.strokeStyle = `rgba(203, 213, 225, ${alpha})`;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(diagP.x, diagP.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // 2. Draw Floating Curved Parallax Mesh Ribbons (Fluid Bluish Structures)
+      const ribbonCount = 2;
+      for (let i = 0; i < ribbonCount; i++) {
+        const ribbonY = (height * 0.35 * (i + 1)) - (smoothedScrollY * 0.18 * (i === 0 ? 1 : -0.8)) % (height + 200);
+        ctx.beginPath();
+        ctx.strokeStyle = i === 0 ? 'rgba(56, 189, 248, 0.12)' : 'rgba(96, 165, 250, 0.1)';
+        ctx.lineWidth = 1.2;
+
+        ctx.moveTo(-50, ribbonY + Math.sin(time + i) * 40);
+        for (let x = 0; x <= width + 60; x += 60) {
+          const wave = Math.sin((x * 0.004) + time + (smoothedScrollY * 0.002)) * 55;
+          ctx.lineTo(x, ribbonY + wave);
+        }
+        ctx.stroke();
+      }
+
+      // 3. Draw Subtle Vertex Light Nodes at key intersections
+      for (let r = 0; r <= rows; r += 2) {
+        for (let c = 0; c <= cols; c += 2) {
+          const p = points[r][c];
+          if (p.x > 0 && p.x < width && p.y > 0 && p.y < height) {
+            const glowAlpha = 0.15 + p.depth * 0.25;
+            ctx.fillStyle = `rgba(147, 197, 253, ${glowAlpha})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 1.4, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+
+      animId = requestAnimationFrame(renderDynamicMesh);
+    }
+
+    // Pause when tab is not active to save battery
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animId);
+      } else {
+        animId = requestAnimationFrame(renderDynamicMesh);
+      }
+    });
+
+    animId = requestAnimationFrame(renderDynamicMesh);
+  }
+});

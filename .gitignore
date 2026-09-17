@@ -1,0 +1,28 @@
+# Environment and secret configuration files
+.env
+.env.*
+!.env.example
+config.local.php
+
+# Operating system & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# Archives and temporary files
+*.zip
+*.tar.gz
+*.rar
+tmp/
+temp/
